@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>请假得劲得劲</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 2px dashed #4a90e2;
+            max-width: 800px;
+            width: 90%;
+            z-index: 10;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            color: #4a90e2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .emoji-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            position: relative;
+            height: 280px;
+            width: 100%;
+            z-index: 10;
+        }
+        
+        .emoji-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin-bottom: 20px;
+        }
+        
+        .emoji-face {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, transform 0.5s ease;
+            background-color: #ffd166;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .neutral {
+            opacity: 1;
+            z-index: 3;
+        }
+        
+        .happy {
+            opacity: 0;
+            z-index: 2;
+            background-color: #ffd166;
+        }
+        
+        .sad {
+            opacity: 0;
+            z-index: 1;
+            background-color: #a9c9e6;
+        }
+        
+        .eye {
+            width: 30px;
+            height: 30px;
+            background-color: #333;
+            border-radius: 50%;
+            margin: 0 15px;
+        }
+        
+        .eyes {
+            display: flex;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+        
+        .mouth {
+            width: 80px;
+            height: 20px;
+            background-color: #333;
+            border-radius: 0 0 40px 40px;
+            transition: all 0.5s ease;
+        }
+        
+        .happy .mouth {
+            width: 100px;
+            height: 50px;
+            border-radius: 0 0 100px 100px;
+            background-color: #e63946;
+        }
+        
+        .sad .mouth {
+            width: 100px;
+            height: 20px;
+            border-radius: 40px 40px 0 0;
+            background-color: #4a90e2;
+        }
+        
+        .happy .eye, .sad .eye {
+            position: relative;
+        }
+        
+        .happy .eye::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 5px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .sad .eye {
+            background-color: #4a90e2;
+        }
+        
+        .emoji-label {
+            font-size: 1.4rem;
+            color: #4a4a4a;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+            min-height: 120px;
+            z-index: 10;
+        }
+        
+        .button {
+            padding: 18px 45px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+            z-index: 20;
+        }
+        
+        .button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .button:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(30, 30);
+                opacity: 0;
+            }
+        }
+        
+        .agree-btn {
+            background: linear-gradient(135deg, #06d6a0 0%, #0cb48a 100%);
+            color: white;
+            position: relative;
+            z-index: 20;
+        }
+        
+        .agree-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(6, 214, 160, 0.3);
+            background: linear-gradient(135deg, #05c293 0%, #0aa078 100%);
+        }
+        
+        .reject-btn {
+            background: linear-gradient(135deg, #ef476f 0%, #e63946 100%);
+            color: white;
+            transition: all 0.3s ease, left 0.5s ease, top 0.5s ease;
+            position: absolute;
+            z-index: 20;
+        }
+        
+        .reject-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(239, 71, 111, 0.3);
+            background: linear-gradient(135deg, #e43c5c 0%, #d32f3e 100%);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            animation: popup 0.5s ease;
+        }
+        
+        @keyframes popup {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .modal h2 {
+            color: #06d6a0;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .modal p {
+            font-size: 1.4rem;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        
+        .modal-btn {
+            padding: 12px 35px;
+            font-size: 1.2rem;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-btn:hover {
+            background-color: #3a7bc8;
+            transform: translateY(-3px);
+        }
+        
+        .instructions {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #666;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        
+        .highlight {
+            color: #e63946;
+            font-weight: 600;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            color: #888;
+            font-size: 0.9rem;
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .move-counter {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            background-color: rgba(239, 71, 111, 0.9);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        
+        .escape-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 30;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                min-height: 200px;
+            }
+            
+            .button {
+                width: 80%;
+            }
+            
+            .emoji-wrapper {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .reject-btn {
+                position: absolute;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="move-counter" id="move-counter">逃跑次数: 0</div>
+    
+    <div class="header">
+        <h1>我今天不得劲，想请假得劲得劲</h1>
+        <p class="subtitle">我真的不得劲</p>
+    </div>
+    
+    <div class="emoji-container">
+        <div class="emoji-wrapper">
+            <div class="emoji-face neutral" id="neutral-face">
+                <div class="eyes">
+                    <div class="eye"></div>
+                    <div class="eye"></div>
+                </div>
+                <div class="mouth"></div>
+            </div>
+            <div class="emoji-face happy" id="happy-face">
+                <div class="eyes">
+                    <div class="eye"></div>
+                    <div class="eye"></div>
+                </div>
+                <div class="mouth"></div>
+            </div>
+            <div class="emoji-face sad" id="sad-face">
+                <div class="eyes">
+                    <div class="eye"></div>
+                    <div class="eye"></div>
+                </div>
+                <div class="mouth"></div>
+            </div>
+        </div>
+        <div class="emoji-label" id="emoji-label">默认表情</div>
+    </div>
+    
+    <div class="button-container">
+        <button class="button agree-btn" id="agree-btn">
+            <i class="fas fa-check-circle"></i> 同意请假
+        </button>
+        <button class="button reject-btn" id="reject-btn">
+            <i class="fas fa-times-circle"></i> 拒绝请假
+        </button>
+    </div>
+    
+    <div class="instructions">
+        <p>提示：你无法拒绝</p>
+    </div>
+    
+    <div class="footer">
+        <p>请假得劲得劲系统 © 2025 | 设计：Ciallo～(∠・ω＜ )⌒★</p>
+    </div>
+    
+    <div class="escape-message" id="escape-message">按钮逃跑了！</div>
+    
+    <div class="modal" id="success-modal">
+        <div class="modal-content">
+            <h2>请假批准！</h2>
+            <p><i class="fas fa-check-circle" style="color:#06d6a0; font-size: 4rem; margin: 20px 0;"></i></p>
+            <p>可以回家得劲得劲咯！</p>
+            <p>好好休息，养足精神再回来工作！</p>
+            <button class="modal-btn" id="close-modal">好的，得劲！</button>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const agreeBtn = document.getElementById('agree-btn');
+        const rejectBtn = document.getElementById('reject-btn');
+        const happyFace = document.getElementById('happy-face');
+        const sadFace = document.getElementById('sad-face');
+        const neutralFace = document.getElementById('neutral-face');
+        const emojiLabel = document.getElementById('emoji-label');
+        const successModal = document.getElementById('success-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const moveCounter = document.getElementById('move-counter');
+        const escapeMessage = document.getElementById('escape-message');
+        
+        // 初始化变量
+        let moveCount = 0;
+        let escapeSpeed = 1; // 初始逃跑速度系数
+        
+        // 表情状态控制函数
+        function showHappyFace() {
+            happyFace.style.opacity = '1';
+            sadFace.style.opacity = '0';
+            neutralFace.style.opacity = '0';
+            emojiLabel.textContent = '开心笑脸';
+            emojiLabel.style.color = '#06d6a0';
+        }
+        
+        function showSadFace() {
+            happyFace.style.opacity = '0';
+            sadFace.style.opacity = '1';
+            neutralFace.style.opacity = '0';
+            emojiLabel.textContent = '伤心哭脸';
+            emojiLabel.style.color = '#e63946';
+        }
+        
+        function showNeutralFace() {
+            happyFace.style.opacity = '0';
+            sadFace.style.opacity = '0';
+            neutralFace.style.opacity = '1';
+            emojiLabel.textContent = '默认表情';
+            emojiLabel.style.color = '#4a4a4a';
+        }
+        
+        // 显示逃跑消息
+        function showEscapeMessage() {
+            escapeMessage.style.opacity = '1';
+            setTimeout(() => {
+                escapeMessage.style.opacity = '0';
+            }, 1000);
+        }
+        
+        // 鼠标悬停事件
+        agreeBtn.addEventListener('mouseenter', showHappyFace);
+        rejectBtn.addEventListener('mouseenter', showSadFace);
+        
+        // 鼠标离开事件
+        agreeBtn.addEventListener('mouseleave', showNeutralFace);
+        rejectBtn.addEventListener('mouseleave', showNeutralFace);
+        
+        // 拒绝按钮点击事件 - 随机移动位置（扩大范围）
+        rejectBtn.addEventListener('click', function() {
+            // 更新移动次数
+            moveCount++;
+            moveCounter.textContent = `逃跑次数: ${moveCount}`;
+            
+            // 增加逃跑速度系数
+            escapeSpeed = 1 + (moveCount * 0.1);
+            
+            // 显示逃跑消息
+            showEscapeMessage();
+            
+            // 获取视口尺寸
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            // 获取按钮尺寸
+            const buttonWidth = rejectBtn.offsetWidth;
+            const buttonHeight = rejectBtn.offsetHeight;
+            
+            // 计算可移动的最大范围（整个视口减去按钮尺寸）
+            const maxX = viewportWidth - buttonWidth;
+            const maxY = viewportHeight - buttonHeight;
+            
+            // 确保最小值为0
+            const safeMaxX = Math.max(0, maxX);
+            const safeMaxY = Math.max(0, maxY);
+            
+            // 生成随机位置（使用escapeSpeed系数增加移动距离）
+            const randomX = Math.floor(Math.random() * safeMaxX * escapeSpeed) % safeMaxX;
+            const randomY = Math.floor(Math.random() * safeMaxY * escapeSpeed) % safeMaxY;
+            
+            // 确保按钮不会移出视口
+            const finalX = Math.max(0, Math.min(randomX, safeMaxX));
+            const finalY = Math.max(0, Math.min(randomY, safeMaxY));
+            
+            // 应用新位置（使用固定定位，相对于视口）
+            rejectBtn.style.position = 'fixed';
+            rejectBtn.style.left = `${finalX}px`;
+            rejectBtn.style.top = `${finalY}px`;
+            
+            // 随机旋转按钮增加趣味性
+            const randomRotation = (Math.random() * 60) - 30; // -30到30度之间
+            rejectBtn.style.transform = `rotate(${randomRotation}deg) translateY(-5px)`;
+            
+            // 显示拒绝消息
+            emojiLabel.textContent = `拒绝请假，按钮逃跑了${moveCount}次！`;
+            emojiLabel.style.color = '#e63946';
+            showSadFace();
+            
+            // 添加拒绝动画效果
+            rejectBtn.style.transition = 'all 0.5s ease, transform 0.3s ease';
+            
+            // 随机改变按钮大小（使其更难点击）
+            if (moveCount > 3) {
+                const randomScale = 0.7 + (Math.random() * 0.6); // 0.7到1.3之间
+                rejectBtn.style.transform = `rotate(${randomRotation}deg) scale(${randomScale})`;
+            }
+            
+            // 随机改变按钮颜色
+            if (moveCount > 5) {
+                const hue = Math.floor(Math.random() * 360);
+                rejectBtn.style.background = `linear-gradient(135deg, hsl(${hue}, 70%, 60%) 0%, hsl(${hue + 20}, 70%, 50%) 100%)`;
+            }
+            
+            // 如果移动次数过多，让按钮偶尔移动到屏幕外一点（部分可见）
+            if (moveCount > 8) {
+                const chance = Math.random();
+                if (chance > 0.7) { // 30%的几率部分移出屏幕
+                    const partialOutX = (Math.random() > 0.5) ? 
+                        -buttonWidth * 0.7 : // 70%在屏幕外
+                        viewportWidth - buttonWidth * 0.3; // 30%在屏幕外
+                    
+                    const partialOutY = (Math.random() > 0.5) ? 
+                        -buttonHeight * 0.7 : 
+                        viewportHeight - buttonHeight * 0.3;
+                    
+                    rejectBtn.style.left = `${partialOutX}px`;
+                    rejectBtn.style.top = `${partialOutY}px`;
+                }
+            }
+            
+            // 移动次数越多，按钮越难点击
+            if (moveCount > 12) {
+                // 添加跳动动画
+                rejectBtn.style.animation = 'jump 0.5s ease';
+                setTimeout(() => {
+                    rejectBtn.style.animation = '';
+                }, 500);
+            }
+        });
+        
+        // 同意按钮点击事件 - 显示成功模态框
+        agreeBtn.addEventListener('click', function() {
+            successModal.style.display = 'flex';
+            showHappyFace();
+            emojiLabel.textContent = '请假成功！可以回家得劲了！';
+            emojiLabel.style.color = '#06d6a0';
+            
+            // 添加点击动画效果
+            agreeBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                agreeBtn.style.transform = 'scale(1)';
+            }, 200);
+        });
+        
+        // 关闭模态框
+        closeModalBtn.addEventListener('click', function() {
+            successModal.style.display = 'none';
+            showNeutralFace();
+            emojiLabel.textContent = '默认表情';
+            emojiLabel.style.color = '#4a4a4a';
+        });
+        
+        // 点击模态框外部也可以关闭
+        successModal.addEventListener('click', function(e) {
+            if (e.target === successModal) {
+                successModal.style.display = 'none';
+                showNeutralFace();
+                emojiLabel.textContent = '默认表情';
+                emojiLabel.style.color = '#4a4a4a';
+            }
+        });
+        
+        // 初始化显示中性表情
+        showNeutralFace();
+        
+        // 添加CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes jump {
+                0% { transform: translateY(0); }
+                50% { transform: translateY(-20px); }
+                100% { transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
