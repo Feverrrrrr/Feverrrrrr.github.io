@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>请假得劲得劲</title>
+    <title>请假得劲得劲 - 计时挑战版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -34,7 +34,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border: 2px dashed #4a90e2;
-            max-width: 800px;
+            max-width: 900px;
             width: 90%;
             z-index: 10;
         }
@@ -52,12 +52,59 @@
             font-weight: 500;
         }
         
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-box {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .stat-title {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+        
+        .timer-value {
+            color: #e63946;
+        }
+        
+        .escape-value {
+            color: #ef476f;
+        }
+        
         .emoji-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 30px 0;
+            margin: 20px 0;
             position: relative;
             height: 280px;
             width: 100%;
@@ -175,7 +222,7 @@
             display: flex;
             justify-content: center;
             gap: 40px;
-            margin: 30px 0;
+            margin: 20px 0;
             flex-wrap: wrap;
             width: 100%;
             max-width: 800px;
@@ -254,6 +301,80 @@
             background: linear-gradient(135deg, #e43c5c 0%, #d32f3e 100%);
         }
         
+        .leaderboard-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 20px;
+            margin-top: 20px;
+            max-width: 900px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid #4a90e2;
+            z-index: 10;
+        }
+        
+        .leaderboard-title {
+            font-size: 1.8rem;
+            color: #4a90e2;
+            text-align: center;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.1rem;
+        }
+        
+        .leaderboard-table th {
+            background-color: #4a90e2;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .leaderboard-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .leaderboard-table tr:nth-child(even) {
+            background-color: rgba(74, 144, 226, 0.05);
+        }
+        
+        .leaderboard-table tr:hover {
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+        
+        .rank-badge {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ffd166;
+            color: #333;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .rank-1 .rank-badge {
+            background-color: #ffd700;
+        }
+        
+        .rank-2 .rank-badge {
+            background-color: #c0c0c0;
+        }
+        
+        .rank-3 .rank-badge {
+            background-color: #cd7f32;
+        }
+        
         .modal {
             display: none;
             position: fixed;
@@ -316,7 +437,7 @@
             padding: 15px 25px;
             border-radius: 15px;
             margin-top: 20px;
-            max-width: 800px;
+            max-width: 900px;
             width: 90%;
             text-align: center;
             font-size: 1.1rem;
@@ -367,9 +488,33 @@
             z-index: 30;
         }
         
+        .timer-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .timer-progress {
+            height: 100%;
+            background: linear-gradient(to right, #06d6a0, #4a90e2, #ef476f);
+            width: 100%;
+            transition: width 1s linear;
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.2rem;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+            }
+            
+            .stat-box {
+                min-width: 100%;
             }
             
             .button-container {
@@ -391,6 +536,19 @@
             .reject-btn {
                 position: absolute;
             }
+            
+            .leaderboard-container {
+                padding: 15px;
+            }
+            
+            .leaderboard-table {
+                font-size: 0.9rem;
+            }
+            
+            .leaderboard-table th, 
+            .leaderboard-table td {
+                padding: 8px 10px;
+            }
         }
     </style>
 </head>
@@ -399,47 +557,84 @@
     
     <div class="header">
         <h1>我今天不得劲，想请假得劲得劲</h1>
-        <p class="subtitle">我真的不得劲</p>
+        <p class="subtitle">计时挑战：在30秒内点击尽可能多的"拒绝"按钮！</p>
     </div>
     
-    <div class="emoji-container">
-        <div class="emoji-wrapper">
-            <div class="emoji-face neutral" id="neutral-face">
-                <div class="eyes">
-                    <div class="eye"></div>
-                    <div class="eye"></div>
+    <div class="game-container">
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-title">计时器</div>
+                <div class="stat-value timer-value" id="timer">30秒</div>
+                <div class="timer-bar">
+                    <div class="timer-progress" id="timer-progress"></div>
                 </div>
-                <div class="mouth"></div>
             </div>
-            <div class="emoji-face happy" id="happy-face">
-                <div class="eyes">
-                    <div class="eye"></div>
-                    <div class="eye"></div>
-                </div>
-                <div class="mouth"></div>
+            <div class="stat-box">
+                <div class="stat-title">本局逃跑次数</div>
+                <div class="stat-value escape-value" id="current-escapes">0</div>
             </div>
-            <div class="emoji-face sad" id="sad-face">
-                <div class="eyes">
-                    <div class="eye"></div>
-                    <div class="eye"></div>
-                </div>
-                <div class="mouth"></div>
+            <div class="stat-box">
+                <div class="stat-title">最高记录</div>
+                <div class="stat-value" id="best-score">0</div>
             </div>
         </div>
-        <div class="emoji-label" id="emoji-label">默认表情</div>
-    </div>
-    
-    <div class="button-container">
-        <button class="button agree-btn" id="agree-btn">
-            <i class="fas fa-check-circle"></i> 同意请假
-        </button>
-        <button class="button reject-btn" id="reject-btn">
-            <i class="fas fa-times-circle"></i> 拒绝请假
-        </button>
-    </div>
-    
-    <div class="instructions">
-        <p>提示：你无法拒绝</p>
+        
+        <div class="emoji-container">
+            <div class="emoji-wrapper">
+                <div class="emoji-face neutral" id="neutral-face">
+                    <div class="eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+                <div class="emoji-face happy" id="happy-face">
+                    <div class="eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+                <div class="emoji-face sad" id="sad-face">
+                    <div class="eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+            </div>
+            <div class="emoji-label" id="emoji-label">等待挑战开始</div>
+        </div>
+        
+        <div class="button-container">
+            <button class="button agree-btn" id="agree-btn">
+                <i class="fas fa-check-circle"></i> 同意请假
+            </button>
+            <button class="button reject-btn" id="reject-btn">
+                <i class="fas fa-times-circle"></i> 拒绝请假
+            </button>
+        </div>
+        
+        <div class="instructions">
+            <p><span class="highlight">游戏规则：</span>第一次点击"拒绝"按钮后，计时30秒开始。计时期间，每次点击"拒绝"按钮会增加逃跑次数。计时结束后或点击"同意"按钮，记录本次逃跑次数并更新排行榜。</p>
+        </div>
+        
+        <div class="leaderboard-container">
+            <h2 class="leaderboard-title"><i class="fas fa-trophy"></i> 逃跑次数排行榜</h2>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>排名</th>
+                        <th>逃跑次数</th>
+                        <th>日期</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- 排行榜数据将通过JavaScript动态生成 -->
+                </tbody>
+            </table>
+        </div>
     </div>
     
     <div class="footer">
@@ -452,9 +647,20 @@
         <div class="modal-content">
             <h2>请假批准！</h2>
             <p><i class="fas fa-check-circle" style="color:#06d6a0; font-size: 4rem; margin: 20px 0;"></i></p>
-            <p>可以回家得劲得劲咯！</p>
+            <p>本局共拒绝 <span id="final-escapes" style="color:#ef476f; font-weight:bold;">0</span> 次</p>
             <p>好好休息，养足精神再回来工作！</p>
-            <button class="modal-btn" id="close-modal">好的，得劲！</button>
+            <button class="modal-btn" id="close-modal">继续挑战</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="timeup-modal">
+        <div class="modal-content">
+            <h2>时间到！</h2>
+            <p><i class="fas fa-clock" style="color:#4a90e2; font-size: 4rem; margin: 20px 0;"></i></p>
+            <p>30秒内你拒绝了 <span id="timeup-escapes" style="color:#ef476f; font-weight:bold;">0</span> 次</p>
+            <p>手速太慢，对方成功请假得劲去了</p>
+            <p>成绩已记录到排行榜！</p>
+            <button class="modal-btn" id="timeup-close">继续挑战</button>
         </div>
     </div>
 
@@ -467,13 +673,32 @@
         const neutralFace = document.getElementById('neutral-face');
         const emojiLabel = document.getElementById('emoji-label');
         const successModal = document.getElementById('success-modal');
+        const timeupModal = document.getElementById('timeup-modal');
         const closeModalBtn = document.getElementById('close-modal');
+        const timeupCloseBtn = document.getElementById('timeup-close');
         const moveCounter = document.getElementById('move-counter');
         const escapeMessage = document.getElementById('escape-message');
+        const timerDisplay = document.getElementById('timer');
+        const timerProgress = document.getElementById('timer-progress');
+        const currentEscapesDisplay = document.getElementById('current-escapes');
+        const bestScoreDisplay = document.getElementById('best-score');
+        const leaderboardBody = document.getElementById('leaderboard-body');
+        const finalEscapesDisplay = document.getElementById('final-escapes');
+        const timeupEscapesDisplay = document.getElementById('timeup-escapes');
         
         // 初始化变量
         let moveCount = 0;
         let escapeSpeed = 1; // 初始逃跑速度系数
+        let isTimerRunning = false;
+        let timeLeft = 30; // 30秒计时
+        let timerInterval;
+        let currentGameEscapes = 0;
+        let bestScore = localStorage.getItem('bestScore') || 0;
+        let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+        
+        // 初始化显示
+        bestScoreDisplay.textContent = bestScore;
+        updateLeaderboard();
         
         // 表情状态控制函数
         function showHappyFace() {
@@ -496,7 +721,7 @@
             happyFace.style.opacity = '0';
             sadFace.style.opacity = '0';
             neutralFace.style.opacity = '1';
-            emojiLabel.textContent = '默认表情';
+            emojiLabel.textContent = '等待挑战开始';
             emojiLabel.style.color = '#4a4a4a';
         }
         
@@ -506,6 +731,126 @@
             setTimeout(() => {
                 escapeMessage.style.opacity = '0';
             }, 1000);
+        }
+        
+        // 开始计时器
+        function startTimer() {
+            if (isTimerRunning) return;
+            
+            isTimerRunning = true;
+            timeLeft = 30;
+            currentGameEscapes = 0;
+            currentEscapesDisplay.textContent = currentGameEscapes;
+            timerDisplay.textContent = `${timeLeft}秒`;
+            timerProgress.style.width = '100%';
+            emojiLabel.textContent = '计时开始！快点击拒绝按钮！';
+            emojiLabel.style.color = '#e63946';
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `${timeLeft}秒`;
+                timerProgress.style.width = `${(timeLeft / 30) * 100}%`;
+                
+                if (timeLeft <= 0) {
+                    endTimer();
+                    showTimeupModal();
+                }
+            }, 1000);
+        }
+        
+        // 结束计时器
+        function endTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            
+            // 记录本次成绩
+            if (currentGameEscapes > 0) {
+                addToLeaderboard(currentGameEscapes);
+            }
+            
+            // 重置按钮位置和样式
+            resetRejectButton();
+        }
+        
+        // 重置拒绝按钮
+        function resetRejectButton() {
+            rejectBtn.style.position = 'absolute';
+            rejectBtn.style.left = '';
+            rejectBtn.style.top = '';
+            rejectBtn.style.transform = '';
+            rejectBtn.style.background = 'linear-gradient(135deg, #ef476f 0%, #e63946 100%)';
+            rejectBtn.style.animation = '';
+        }
+        
+        // 添加成绩到排行榜
+        function addToLeaderboard(escapes) {
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            leaderboard.push({
+                escapes: escapes,
+                date: dateStr,
+                timestamp: now.getTime()
+            });
+            
+            // 按逃跑次数降序排序
+            leaderboard.sort((a, b) => b.escapes - a.escapes);
+            
+            // 只保留前10名
+            if (leaderboard.length > 10) {
+                leaderboard = leaderboard.slice(0, 10);
+            }
+            
+            // 更新最佳成绩
+            if (escapes > bestScore) {
+                bestScore = escapes;
+                bestScoreDisplay.textContent = bestScore;
+                localStorage.setItem('bestScore', bestScore);
+            }
+            
+            // 保存到本地存储
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+            
+            // 更新排行榜显示
+            updateLeaderboard();
+        }
+        
+        // 更新排行榜显示
+        function updateLeaderboard() {
+            leaderboardBody.innerHTML = '';
+            
+            if (leaderboard.length === 0) {
+                leaderboardBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 30px;">
+                            暂无记录，开始你的第一次挑战吧！
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            leaderboard.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                if (index === 0) row.classList.add('rank-1');
+                else if (index === 1) row.classList.add('rank-2');
+                else if (index === 2) row.classList.add('rank-3');
+                
+                row.innerHTML = `
+                    <td><span class="rank-badge">${index + 1}</span></td>
+                    <td><strong>${entry.escapes}</strong> 次</td>
+                    <td>${entry.date}</td>
+                    <td>${index === 0 ? '<span style="color:#ffd700;">🏆 冠军</span>' : '已完成'}</td>
+                `;
+                
+                leaderboardBody.appendChild(row);
+            });
+        }
+        
+        // 显示时间到模态框
+        function showTimeupModal() {
+            timeupEscapesDisplay.textContent = currentGameEscapes;
+            timeupModal.style.display = 'flex';
         }
         
         // 鼠标悬停事件
@@ -518,12 +863,21 @@
         
         // 拒绝按钮点击事件 - 随机移动位置（扩大范围）
         rejectBtn.addEventListener('click', function() {
-            // 更新移动次数
+            // 如果是第一次点击拒绝，开始计时
+            if (!isTimerRunning) {
+                startTimer();
+            }
+            
+            // 更新总移动次数
             moveCount++;
             moveCounter.textContent = `逃跑次数: ${moveCount}`;
             
+            // 更新当前游戏逃跑次数
+            currentGameEscapes++;
+            currentEscapesDisplay.textContent = currentGameEscapes;
+            
             // 增加逃跑速度系数
-            escapeSpeed = 1 + (moveCount * 0.1);
+            escapeSpeed = 1 + (currentGameEscapes * 0.05);
             
             // 显示逃跑消息
             showEscapeMessage();
@@ -537,8 +891,8 @@
             const buttonHeight = rejectBtn.offsetHeight;
             
             // 计算可移动的最大范围（整个视口减去按钮尺寸）
-            const maxX = viewportWidth - buttonWidth;
-            const maxY = viewportHeight - buttonHeight;
+            const maxX = viewportWidth - buttonWidth - 20;
+            const maxY = viewportHeight - buttonHeight - 20;
             
             // 确保最小值为0
             const safeMaxX = Math.max(0, maxX);
@@ -549,8 +903,8 @@
             const randomY = Math.floor(Math.random() * safeMaxY * escapeSpeed) % safeMaxY;
             
             // 确保按钮不会移出视口
-            const finalX = Math.max(0, Math.min(randomX, safeMaxX));
-            const finalY = Math.max(0, Math.min(randomY, safeMaxY));
+            const finalX = Math.max(10, Math.min(randomX, safeMaxX));
+            const finalY = Math.max(10, Math.min(randomY, safeMaxY));
             
             // 应用新位置（使用固定定位，相对于视口）
             rejectBtn.style.position = 'fixed';
@@ -562,7 +916,7 @@
             rejectBtn.style.transform = `rotate(${randomRotation}deg) translateY(-5px)`;
             
             // 显示拒绝消息
-            emojiLabel.textContent = `拒绝请假，按钮逃跑了${moveCount}次！`;
+            emojiLabel.textContent = `拒绝请假，按钮逃跑了${currentGameEscapes}次！`;
             emojiLabel.style.color = '#e63946';
             showSadFace();
             
@@ -570,19 +924,19 @@
             rejectBtn.style.transition = 'all 0.5s ease, transform 0.3s ease';
             
             // 随机改变按钮大小（使其更难点击）
-            if (moveCount > 3) {
+            if (currentGameEscapes > 5) {
                 const randomScale = 0.7 + (Math.random() * 0.6); // 0.7到1.3之间
                 rejectBtn.style.transform = `rotate(${randomRotation}deg) scale(${randomScale})`;
             }
             
             // 随机改变按钮颜色
-            if (moveCount > 5) {
+            if (currentGameEscapes > 10) {
                 const hue = Math.floor(Math.random() * 360);
                 rejectBtn.style.background = `linear-gradient(135deg, hsl(${hue}, 70%, 60%) 0%, hsl(${hue + 20}, 70%, 50%) 100%)`;
             }
             
             // 如果移动次数过多，让按钮偶尔移动到屏幕外一点（部分可见）
-            if (moveCount > 8) {
+            if (currentGameEscapes > 15) {
                 const chance = Math.random();
                 if (chance > 0.7) { // 30%的几率部分移出屏幕
                     const partialOutX = (Math.random() > 0.5) ? 
@@ -599,7 +953,7 @@
             }
             
             // 移动次数越多，按钮越难点击
-            if (moveCount > 12) {
+            if (currentGameEscapes > 20) {
                 // 添加跳动动画
                 rejectBtn.style.animation = 'jump 0.5s ease';
                 setTimeout(() => {
@@ -608,9 +962,19 @@
             }
         });
         
-        // 同意按钮点击事件 - 显示成功模态框
+        // 同意按钮点击事件 - 结束当前游戏并记录成绩
         agreeBtn.addEventListener('click', function() {
+            if (isTimerRunning) {
+                endTimer();
+            }
+            
+            // 如果当前游戏有逃跑次数，记录成绩
+            if (currentGameEscapes > 0) {
+                addToLeaderboard(currentGameEscapes);
+            }
+            
             successModal.style.display = 'flex';
+            finalEscapesDisplay.textContent = currentGameEscapes;
             showHappyFace();
             emojiLabel.textContent = '请假成功！可以回家得劲了！';
             emojiLabel.style.color = '#06d6a0';
@@ -626,8 +990,18 @@
         closeModalBtn.addEventListener('click', function() {
             successModal.style.display = 'none';
             showNeutralFace();
-            emojiLabel.textContent = '默认表情';
+            emojiLabel.textContent = '等待挑战开始';
             emojiLabel.style.color = '#4a4a4a';
+            resetRejectButton();
+        });
+        
+        // 关闭时间到模态框
+        timeupCloseBtn.addEventListener('click', function() {
+            timeupModal.style.display = 'none';
+            showNeutralFace();
+            emojiLabel.textContent = '等待挑战开始';
+            emojiLabel.style.color = '#4a4a4a';
+            resetRejectButton();
         });
         
         // 点击模态框外部也可以关闭
@@ -635,8 +1009,19 @@
             if (e.target === successModal) {
                 successModal.style.display = 'none';
                 showNeutralFace();
-                emojiLabel.textContent = '默认表情';
+                emojiLabel.textContent = '等待挑战开始';
                 emojiLabel.style.color = '#4a4a4a';
+                resetRejectButton();
+            }
+        });
+        
+        timeupModal.addEventListener('click', function(e) {
+            if (e.target === timeupModal) {
+                timeupModal.style.display = 'none';
+                showNeutralFace();
+                emojiLabel.textContent = '等待挑战开始';
+                emojiLabel.style.color = '#4a4a4a';
+                resetRejectButton();
             }
         });
         
@@ -653,6 +1038,9 @@
             }
         `;
         document.head.appendChild(style);
+        
+        // 初始化排行榜
+        updateLeaderboard();
     </script>
 </body>
 </html>
