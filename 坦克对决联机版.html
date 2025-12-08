@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>坦克对决 - 本地/联机双人游戏</title>
+    <!-- 添加PeerJS库 -->
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        header { text-align: center; margin-bottom: 20px; }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 5px 15px rgba(255, 126, 95, 0.3);
+        }
+        .subtitle { 
+            color: #a0aec0; 
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        /* 联机面板样式 */
+        #networkPanel {
+            background: rgba(0, 0, 0, 0.8); 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin: 20px auto; 
+            max-width: 500px; 
+            width: 100%;
+            text-align: center;
+            border: 2px solid #00dbde;
+            box-shadow: 0 0 20px rgba(0, 219, 222, 0.3);
+        }
+        #connectionStatus {
+            margin: 15px 0; 
+            padding: 12px; 
+            background: #2a2a4a; 
+            border-radius: 5px;
+            font-size: 1.1rem;
+            min-height: 20px;
+        }
+        .network-buttons {
+            display: flex; 
+            gap: 10px; 
+            justify-content: center; 
+            margin: 15px 0;
+        }
+        .network-buttons button {
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        #hostBtn { background: #38b2ac; color: white; }
+        #joinBtn { background: #9f7aea; color: white; }
+        #roomSection { display: none; margin-top: 15px; }
+        #roomIdInput {
+            padding: 10px; 
+            width: 200px; 
+            border-radius: 5px; 
+            border: 2px solid #4fd1c7; 
+            background: #1a1a2e; 
+            color: white;
+            font-size: 1rem;
+        }
+        #connectBtn {
+            padding: 10px 20px; 
+            background: #00dbde; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            margin-left: 10px; 
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #roomInfo {
+            margin-top: 10px; 
+            padding: 12px; 
+            background: #1a1a2e; 
+            border-radius: 5px;
+            line-height: 1.5;
+        }
+        .score-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        #score {
+            font-size: 2rem;
+            padding: 12px 35px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50px;
+            border: 2px solid #00dbde;
+            box-shadow: 0 0 15px rgba(0, 219, 222, 0.5);
+            display: inline-block;
+        }
+        #bulletCount {
+            font-size: 1.2rem;
+            padding: 8px 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 30px;
+            border: 1px solid #4a5568;
+            display: flex;
+            gap: 20px;
+        }
+        .bullet-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bullet-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .bullet-icon.red { background-color: #FF6B6B; }
+        .bullet-icon.blue { background-color: #4ECDC4; }
+        .highlight { 
+            color: #00dbde; 
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(0, 219, 222, 0.7);
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1300px;
+            width: 100%;
+        }
+        #gameCanvas {
+            background-color: #0a0a1a;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+            border: 4px solid #4a5568;
+            image-rendering: crisp-edges;
+        }
+        .panel {
+            background: rgba(20, 25, 45, 0.85);
+            padding: 25px;
+            border-radius: 15px;
+            min-width: 300px;
+            border: 1px solid #3a506b;
+            backdrop-filter: blur(5px);
+        }
+        .panel h3 {
+            color: #6ee7b7;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3a506b;
+            font-size: 1.5rem;
+        }
+        .controls-list {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+        .controls-list li {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: linear-gradient(90deg, rgba(45, 55, 72, 0.7), rgba(30, 40, 60, 0.7));
+            border-radius: 10px;
+            border-left: 5px solid #4299e1;
+            transition: transform 0.2s;
+        }
+        .controls-list li:hover { transform: translateX(5px); }
+        .controls-list kbd {
+            background: #2d3748;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            border: 1px solid #4a5568;
+            margin: 0 4px;
+            box-shadow: 0 2px 0 #1a202c;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        button {
+            background: linear-gradient(to right, #38b2ac, #319795);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        button:hover { 
+            background: linear-gradient(to right, #319795, #2c7a7b); 
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(50, 151, 149, 0.4);
+        }
+        button#soundBtn { background: linear-gradient(to right, #ed8936, #dd6b20); }
+        button#soundBtn:hover { background: linear-gradient(to right, #dd6b20, #c05621); }
+        button#newMapBtn { background: linear-gradient(to right, #9f7aea, #805ad5); }
+        button#newMapBtn:hover { background: linear-gradient(to right, #805ad5, #6b46c1); }
+        .rules p { margin-bottom: 12px; line-height: 1.7; }
+        .update-note {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        footer {
+            margin-top: 40px;
+            color: #718096;
+            text-align: center;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        @media (max-width: 1000px) {
+            .container { flex-direction: column; align-items: center; }
+            #gameCanvas { width: 95% !important; height: auto !important; }
+            .network-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>💥 坦克对决 ♂</h1>
+        <p class="subtitle">输的人是GAY</p>
+        
+        <!-- 联机对战面板 -->
+        <div id="networkPanel">
+            <h3>🕸️ 联机对战</h3>
+            
+            <div id="connectionStatus">
+                当前：<span style="color:#4fd1c7">等待连接...</span>
+            </div>
+            
+            <div class="network-buttons">
+                <button id="hostBtn">🎮 创建房间</button>
+                <button id="joinBtn">🔗 加入房间</button>
+            </div>
+            
+            <div id="roomSection">
+                <div style="margin:10px 0;">
+                    <input type="text" id="roomIdInput" placeholder="输入房间ID">
+                    <button id="connectBtn">连接</button>
+                </div>
+                <div id="roomInfo"></div>
+            </div>
+            
+            <div style="margin-top:15px; font-size:0.9rem; color:#a0aec0;">
+                <p>不联机？直接开始本地双人对战！</p>
+            </div>
+        </div>
+        
+        <!-- 游戏分数和子弹数 -->
+        <div class="score-container">
+            <div id="score">红: <span id="score1">0</span> | 蓝: <span id="score2">0</span></div>
+            <div id="bulletCount">
+                <div class="bullet-info">
+                    <div class="bullet-icon red"></div>
+                    <span>红方子弹: <span id="bulletCount1">0</span>/30</span>
+                </div>
+                <div class="bullet-info">
+                    <div class="bullet-icon blue"></div>
+                    <span>蓝方子弹: <span id="bulletCount2">0</span>/30</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <div class="panel">
+            <h3>🎮 操作与控制</h3>
+            <ul class="controls-list">
+                <li><strong>红色坦克 (玩家1)</strong><br>移动: <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> | 开火: <kbd>F</kbd></li>
+                <li><strong>蓝色坦克 (玩家2)</strong><br>移动: <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> | 开火: <kbd>M</kbd></li>
+                <li><strong>重置控制</strong><br>回合重置: <kbd>空格</kbd> (任何时候) | 游戏重置: 得分5分后按 <kbd>空格</kbd></li>
+                <li><strong>联机控制</strong><br>主机控制红坦克 | 客户端控制蓝坦克</li>
+            </ul>
+            <div class="button-group">
+                <button id="restartBtn">🔄 重新开始游戏</button>
+                <button id="newMapBtn">🗺️ 随机生成新地图</button>
+                <button id="soundBtn">🔊 音效开启中</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>📜 游戏说明</h3>
+            <div class="rules">
+                <p><span class="highlight">版本 2.0 说明：</span></p>
+                <p>1. <strong>子弹数量限制</strong>：每方最多只能有<b>30发</b>子弹在场，超过时自动清除最早发射的子弹。</p>
+                <p>2. <strong>子弹数量实时显示</strong>：在分数下方实时显示双方当前在场子弹数。</p>
+                <p>3. <strong>联机对战功能</strong>：使用PeerJS技术，无需服务器即可远程联机。</p>
+                
+                <div class="update-note">
+                    <p><strong>💎 游戏提示：</strong></p>
+                    <p>• 注意子弹数量限制，合理控制射击频率！</p>
+                    <p>• 死亡后按空格键可立即重新开始当前回合。</p>
+                    <p>• 游戏结束后按空格键可重置整个游戏。</p>
+                    <p>• 联机时：主机控制红坦克，客户端控制蓝坦克。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>坦克对决游戏 © 2025 | 设计：Ciallo～(∠・ω＜ )⌒★ | 支持本地/联机双人游戏</p>
+    </footer>
+
+    <script>
+        // ============== 网络联机模块 ==============
+        class SimpleNetwork {
+            constructor() {
+                this.peer = null;
+                this.conn = null;
+                this.myId = null;
+                this.isHost = false;
+                this.connected = false;
+                this.lastSyncTime = 0;
+            }
+            
+            init() {
+                try {
+                    // 创建Peer实例（使用免费PeerJS服务器）
+                    this.peer = new Peer({
+                        host: '0.peerjs.com',
+                        port: 443,
+                        path: '/',
+                        secure: true,
+                        debug: 1
+                    });
+                    
+                    // 获取自己的ID
+                    this.peer.on('open', (id) => {
+                        this.myId = id;
+                        document.getElementById('connectionStatus').innerHTML = 
+                            `我的ID: <span style="color:#ff7e5f">${id}</span>`;
+                        console.log('PeerJS已连接，我的ID:', id);
+                    });
+                    
+                    // 处理其他玩家连接（主机）
+                    this.peer.on('connection', (conn) => {
+                        console.log('有玩家尝试连接');
+                        this.conn = conn;
+                        this.setupConnection();
+                        this.isHost = true;
+                        this.connected = true;
+                        this.updateUI();
+                        console.log('玩家已加入！');
+                    });
+                    
+                    // 错误处理
+                    this.peer.on('error', (err) => {
+                        console.error('网络错误:', err);
+                        let errorMsg = err.type;
+                        if (err.type === 'peer-unavailable') {
+                            errorMsg = '对方ID不存在或已离线';
+                        } else if (err.type === 'network') {
+                            errorMsg = '网络连接问题，请检查网络';
+                        }
+                        document.getElementById('connectionStatus').innerHTML = 
+                            `错误: <span style="color:#ff6b6b">${errorMsg}</span>`;
+                    });
+                    
+                    // 断开连接
+                    this.peer.on('disconnected', () => {
+                        console.log('PeerJS连接断开');
+                        this.connected = false;
+                        document.getElementById('connectionStatus').innerHTML = 
+                            `<span style="color:#ff6b6b">❌ 连接断开，请刷新页面重试</span>`;
+                    });
+                    
+                } catch (error) {
+                    console.error('初始化PeerJS失败:', error);
+                    document.getElementById('connectionStatus').innerHTML = 
+                        `初始化失败: <span style="color:#ff6b6b">请刷新页面重试</span>`;
+                }
+            }
+            
+            // 连接到其他玩家
+            connectTo(peerId) {
+                if (!peerId || peerId.trim() === '') {
+                    document.getElementById('roomInfo').innerHTML += 
+                        '<br><span style="color:#ff6b6b">请输入有效的房间ID</span>';
+                    return;
+                }
+                
+                console.log('正在连接到:', peerId);
+                document.getElementById('roomInfo').innerHTML = 
+                    `正在连接到 <span style="color:#4fd1c7">${peerId}</span>...`;
+                
+                try {
+                    this.conn = this.peer.connect(peerId, {
+                        reliable: true
+                    });
+                    
+                    this.setupConnection();
+                    this.isHost = false;
+                    this.connected = true;
+                    this.updateUI();
+                    
+                    // 设置超时检测
+                    setTimeout(() => {
+                        if (!this.conn.open) {
+                            document.getElementById('roomInfo').innerHTML += 
+                                '<br><span style="color:#ff6b6b">连接超时，请检查ID是否正确</span>';
+                        }
+                    }, 5000);
+                    
+                } catch (error) {
+                    console.error('连接失败:', error);
+                    document.getElementById('roomInfo').innerHTML += 
+                        '<br><span style="color:#ff6b6b">连接失败，请检查ID</span>';
+                }
+            }
+            
+            // 设置连接
+            setupConnection() {
+                this.conn.on('open', () => {
+                    console.log('Peer连接已建立！');
+                    document.getElementById('connectionStatus').innerHTML = 
+                        `<span style="color:#68d391">✅ 已连接！</span>`;
+                    this.startNetworkGame();
+                });
+                
+                this.conn.on('data', (data) => {
+                    this.handleNetworkData(data);
+                });
+                
+                this.conn.on('close', () => {
+                    console.log('连接已关闭');
+                    this.connected = false;
+                    document.getElementById('connectionStatus').innerHTML = 
+                        `<span style="color:#ff6b6b">❌ 连接断开</span>`;
+                });
+                
+                this.conn.on('error', (err) => {
+                    console.error('连接错误:', err);
+                });
+            }
+            
+            // 发送数据
+            send(data) {
+                if (this.conn && this.conn.open) {
+                    try {
+                        this.conn.send(JSON.stringify(data));
+                        return true;
+                    } catch (error) {
+                        console.error('发送数据失败:', error);
+                        return false;
+                    }
+                }
+                return false;
+            }
+            
+            // 处理网络数据
+            handleNetworkData(rawData) {
+                try {
+                    const data = JSON.parse(rawData);
+                    const now = Date.now();
+                    
+                    // 忽略太旧的数据（超过500ms）
+                    if (data.timestamp && now - data.timestamp > 500) {
+                        return;
+                    }
+                    
+                    if (data.type === 'tank') {
+                        // 同步对方坦克
+                        const remoteTank = this.isHost ? tank2 : tank1;
+                        if (remoteTank && remoteTank.isAlive) {
+                            remoteTank.x = data.x;
+                            remoteTank.y = data.y;
+                            remoteTank.angle = data.angle;
+                            remoteTank.isMoving = data.isMoving || false;
+                        }
+                    } else if (data.type === 'bullet') {
+                        // 同步子弹（只处理对方的子弹）
+                        if ((this.isHost && data.tankId === 2) || (!this.isHost && data.tankId === 1)) {
+                            // 检查子弹是否已存在（防止重复）
+                            const bulletExists = bullets.some(b => 
+                                Math.abs(b.x - data.x) < 5 && 
+                                Math.abs(b.y - data.y) < 5 && 
+                                Math.abs(b.angle - data.angle) < 0.1
+                            );
+                            
+                            if (!bulletExists) {
+                                bullets.push(new Bullet(data.x, data.y, data.angle, data.color, data.tankId));
+                            }
+                        }
+                    } else if (data.type === 'score') {
+                        // 同步分数
+                        score1 = data.score1;
+                        score2 = data.score2;
+                        score1El.textContent = score1;
+                        score2El.textContent = score2;
+                    } else if (data.type === 'hit') {
+                        // 同步击中事件
+                        if (data.player === 1 && tank1.isAlive) {
+                            tank1.hit();
+                        } else if (data.player === 2 && tank2.isAlive) {
+                            tank2.hit();
+                        }
+                    } else if (data.type === 'walls') {
+                        // 同步地图（主机发送给客户端）
+                        if (!this.isHost) {
+                            walls = data.walls.map(w => ({x: w.x, y: w.y}));
+                        }
+                    } else if (data.type === 'sync_request') {
+                        // 客户端请求同步
+                        if (this.isHost) {
+                            // 发送完整状态
+                            this.sendFullState();
+                        }
+                    }
+                } catch(e) {
+                    console.error('数据解析错误:', e, rawData);
+                }
+            }
+            
+            // 发送完整状态（主机用）
+            sendFullState() {
+                if (!this.isHost || !this.connected) return;
+                
+                this.send({
+                    type: 'score',
+                    score1: score1,
+                    score2: score2,
+                    timestamp: Date.now()
+                });
+                
+                this.send({
+                    type: 'walls',
+                    walls: walls,
+                    timestamp: Date.now()
+                });
+                
+                // 发送坦克状态
+                this.send({
+                    type: 'tank',
+                    x: tank1.x,
+                    y: tank1.y,
+                    angle: tank1.angle,
+                    tankId: 1,
+                    timestamp: Date.now()
+                });
+                
+                this.send({
+                    type: 'tank',
+                    x: tank2.x,
+                    y: tank2.y,
+                    angle: tank2.angle,
+                    tankId: 2,
+                    timestamp: Date.now()
+                });
+            }
+            
+            // 开始网络游戏
+            startNetworkGame() {
+                // 分配控制权
+                if (this.isHost) {
+                    // 主机控制红坦克，同步蓝坦克
+                    tank1.isLocal = true;
+                    tank2.isLocal = false;
+                    console.log('你是主机，控制红坦克');
+                    
+                    // 发送初始地图给客户端
+                    setTimeout(() => {
+                        this.send({
+                            type: 'walls',
+                            walls: walls,
+                            timestamp: Date.now()
+                        });
+                    }, 500);
+                } else {
+                    // 客户端控制蓝坦克，同步红坦克
+                    tank1.isLocal = false;
+                    tank2.isLocal = true;
+                    console.log('你是客户端，控制蓝坦克');
+                    
+                    // 请求完整状态同步
+                    setTimeout(() => {
+                        this.send({
+                            type: 'sync_request',
+                            timestamp: Date.now()
+                        });
+                    }, 500);
+                }
+                
+                // 隐藏联机面板
+                document.getElementById('networkPanel').style.display = 'none';
+                
+                // 开始网络同步
+                this.startNetworkSync();
+            }
+            
+            // 开始网络同步
+            startNetworkSync() {
+                // 每100ms同步一次状态
+                const syncInterval = setInterval(() => {
+                    if (!this.connected) {
+                        clearInterval(syncInterval);
+                        return;
+                    }
+                    
+                    const now = Date.now();
+                    // 限制同步频率
+                    if (now - this.lastSyncTime < 100) return;
+                    this.lastSyncTime = now;
+                    
+                    // 同步自己的坦克
+                    const myTank = this.isHost ? tank1 : tank2;
+                    const tankId = this.isHost ? 1 : 2;
+                    
+                    if (myTank && myTank.isAlive) {
+                        this.send({
+                            type: 'tank',
+                            x: myTank.x,
+                            y: myTank.y,
+                            angle: myTank.angle,
+                            tankId: tankId,
+                            isMoving: myTank.isMoving,
+                            timestamp: now
+                        });
+                    }
+                    
+                    // 主机同步分数
+                    if (this.isHost) {
+                        this.send({
+                            type: 'score',
+                            score1: score1,
+                            score2: score2,
+                            timestamp: now
+                        });
+                    }
+                    
+                }, 100);
+            }
+            
+            // 更新UI
+            updateUI() {
+                const info = document.getElementById('roomInfo');
+                if (this.isHost) {
+                    info.innerHTML = `你是<span style="color:#ff7e5f">主机</span>（控制红坦克）`;
+                } else {
+                    info.innerHTML = `你是<span style="color:#4ECDC4">客户端</span>（控制蓝坦克）`;
+                }
+            }
+        }
+        
+        // 创建全局网络实例
+        const network = new SimpleNetwork();
+        // ============== 网络模块结束 ==============
+
+        // ============== 游戏核心代码开始 ==============
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const score1El = document.getElementById('score1');
+        const score2El = document.getElementById('score2');
+        const bulletCount1El = document.getElementById('bulletCount1');
+        const bulletCount2El = document.getElementById('bulletCount2');
+        const restartBtn = document.getElementById('restartBtn');
+        const newMapBtn = document.getElementById('newMapBtn');
+        const soundBtn = document.getElementById('soundBtn');
+
+        // 游戏状态
+        let score1 = 0, score2 = 0;
+        let gameOver = false;
+        let roundPaused = false; // 回合暂停（用于死亡暂停）
+        let deathPauseTimer = 0; // 死亡暂停计时器
+        let deathPauseDuration = 90; // 死亡暂停时长（帧数，约1.5秒）
+        let waitingForSpace = false; // 等待空格键状态
+        let deathMessage = ''; // 死亡提示信息
+        let walls = [];
+        const TILE_SIZE = 40;
+        const MAP_WIDTH = Math.floor(canvas.width / TILE_SIZE);
+        const MAP_HEIGHT = Math.floor(canvas.height / TILE_SIZE);
+
+        // 子弹管理
+        let bullets = [];
+        const MAX_BULLETS_PER_TANK = 30; // 每方最多子弹数
+        let tank1Bullets = []; // 红方子弹列表（存储子弹ID）
+        let tank2Bullets = []; // 蓝方子弹列表（存储子弹ID）
+        let bulletIdCounter = 0; // 子弹ID计数器
+
+        // ============== 高级音效系统 ==============
+        let soundEnabled = true;
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let backgroundGainNode;
+
+        // 初始化背景音
+        function initBackgroundSound() {
+            if (!soundEnabled) return;
+            backgroundGainNode = audioContext.createGain();
+            backgroundGainNode.gain.setValueAtTime(0.03, audioContext.currentTime);
+            backgroundGainNode.connect(audioContext.destination);
+            const oscillator = audioContext.createOscillator();
+            oscillator.connect(backgroundGainNode);
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(110, audioContext.currentTime);
+            oscillator.start();
+            return oscillator;
+        }
+        let bgSound = initBackgroundSound();
+
+        function stopBackgroundSound() {
+            if (bgSound) {
+                bgSound.stop();
+                bgSound = null;
+            }
+        }
+
+        function playSound(freq, duration, type='sine', vol=0.2, freqVary=0) {
+            if (!soundEnabled || !audioContext) return;
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                const baseFreq = freq + (Math.random() * 2 - 1) * freqVary;
+                oscillator.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+                oscillator.type = type;
+                gainNode.gain.setValueAtTime(vol, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            } catch(e) {}
+        }
+
+        // 丰富多样的音效函数
+        function playShootSound() {
+            const variants = [
+                () => playSound(600 + Math.random()*300, 0.08, 'square', 0.18, 50),
+                () => playSound(800 + Math.random()*200, 0.1, 'sawtooth', 0.16, 40),
+                () => playSound(500, 0.12, 'triangle', 0.15, 30)
+            ];
+            variants[Math.floor(Math.random() * variants.length)]();
+        }
+
+        // 子弹反弹音效：3种相近频率的随机音效
+        function playHitWallSound() {
+            const frequencies = [250, 300, 350];
+            const freq = frequencies[Math.floor(Math.random() * frequencies.length)];
+            playSound(freq, 0.08, 'sawtooth', 0.08, 10);
+        }
+
+        function playHitTankSound() {
+            playSound(80, 0.4, 'sine', 0.3, 5);
+            setTimeout(() => playSound(60, 0.5, 'sine', 0.25, 3), 50);
+        }
+
+        function playExplosionSound() {
+            for(let i=0; i<5; i++) {
+                setTimeout(() => {
+                    playSound(40 + i*15, 0.3, 'sawtooth', 0.2, 10);
+                }, i * 60);
+            }
+        }
+
+        function playEngineSound(isMoving) {
+            if(!isMoving || !soundEnabled) return;
+            playSound(50, 0.2, 'sine', 0.05, 2);
+        }
+
+        function playWinSound() {
+            const melody = [523.25, 659.25, 783.99, 1046.50];
+            melody.forEach((freq, i) => {
+                setTimeout(() => playSound(freq, 0.4, 'sine', 0.3), i * 220);
+            });
+        }
+
+        // ============== 爆炸粒子系统 ==============
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.size = Math.random() * 6 + 2;
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * 6 - 3;
+                this.life = 1.0;
+                this.decay = Math.random() * 0.05 + 0.02;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= this.decay;
+                return this.life > 0;
+            }
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        let particles = [];
+
+        function createExplosion(x, y, color) {
+            playExplosionSound();
+            for(let i=0; i<25; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        // ============== 游戏对象 ==============
+        function generateWalls() {
+            walls = [];
+            for(let y=1; y<MAP_HEIGHT-1; y++) {
+                for(let x=1; x<MAP_WIDTH-1; x++) {
+                    const nearCenter = (x > MAP_WIDTH/2-3 && x < MAP_WIDTH/2+2 &&
+                                      y > MAP_HEIGHT/2-2 && y < MAP_HEIGHT/2+2);
+                    const isSpawn = (x<3 && y<3) || (x>MAP_WIDTH-4 && y>MAP_HEIGHT-4);
+                    if(Math.random() < 0.22 && !nearCenter && !isSpawn) {
+                        walls.push({x: x*TILE_SIZE, y: y*TILE_SIZE});
+                    }
+                }
+            }
+            if(walls.length < 10) {
+                for(let i=0; i<10; i++) {
+                    walls.push({
+                        x: Math.floor(Math.random()*(MAP_WIDTH-4)+2)*TILE_SIZE,
+                        y: Math.floor(Math.random()*(MAP_HEIGHT-4)+2)*TILE_SIZE
+                    });
+                }
+            }
+        }
+
+        class Tank {
+            constructor(x, y, color, controls) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.width = 24;
+                this.height = 24;
+                this.angle = 0;
+                this.speed = 2.2;
+                this.controls = controls;
+                this.cooldown = 0;
+                this.cooldownMax = 20;
+                this.lastMove = { x:0, y:0 };
+                this.isMoving = false;
+                this.moveSoundTimer = 0;
+                this.isAlive = true;
+                this.isVisible = true;
+                this.isLocal = true; // 默认本地控制，网络连接后会修改
+            }
+            update(keys) {
+                // 如果是网络模式且不是本地控制的坦克，则不响应键盘
+                if (network.connected && !this.isLocal) {
+                    // 但坦克仍然会被网络数据更新位置
+                    return;
+                }
+                
+                // 如果游戏暂停或游戏结束，不接受输入
+                if(roundPaused || gameOver) return;
+                
+                // 如果坦克死亡，不接受输入
+                if(!this.isAlive) return;
+
+                let moveX=0, moveY=0;
+                this.isMoving = false;
+
+                if(keys[this.controls.up]) { moveY -= 1; this.lastMove = {x:0,y:-1}; this.isMoving=true; }
+                if(keys[this.controls.down]) { moveY += 1; this.lastMove = {x:0,y:1}; this.isMoving=true; }
+                if(keys[this.controls.left]) { moveX -= 1; this.lastMove = {x:-1,y:0}; this.isMoving=true; }
+                if(keys[this.controls.right]) { moveX += 1; this.lastMove = {x:1,y:0}; this.isMoving=true; }
+
+                if(this.isMoving) {
+                    this.angle = Math.atan2(this.lastMove.y, this.lastMove.x);
+                    this.moveSoundTimer++;
+                    if(this.moveSoundTimer > 10) {
+                        playEngineSound(true);
+                        this.moveSoundTimer = 0;
+                    }
+                }
+
+                // 独立处理每个轴向的移动
+                let newX = this.x;
+                let newY = this.y;
+
+                if(moveX !== 0) {
+                    newX = this.x + moveX * this.speed;
+                    if(newX < -this.width/2) newX = canvas.width - this.width/2;
+                    if(newX > canvas.width - this.width/2) newX = -this.width/2;
+                    let canMoveX = true;
+                    for(let wall of walls) {
+                        if(this.collidesWith(wall, newX, this.y)) {
+                            canMoveX = false;
+                            break;
+                        }
+                    }
+                    if(canMoveX) {
+                        this.x = newX;
+                    }
+                }
+
+                if(moveY !== 0) {
+                    newY = this.y + moveY * this.speed;
+                    if(newY < -this.height/2) newY = canvas.height - this.height/2;
+                    if(newY > canvas.height - this.height/2) newY = -this.height/2;
+                    let canMoveY = true;
+                    for(let wall of walls) {
+                        if(this.collidesWith(wall, this.x, newY)) {
+                            canMoveY = false;
+                            break;
+                        }
+                    }
+                    if(canMoveY) {
+                        this.y = newY;
+                    }
+                }
+
+                if(this.cooldown > 0) this.cooldown--;
+                if(keys[this.controls.fire] && this.cooldown === 0 && this.isAlive) {
+                    const bx = this.x + Math.cos(this.angle)*20;
+                    const by = this.y + Math.sin(this.angle)*20;
+                    
+                    // 检查炮口是否深入墙壁
+                    let bulletAngle = this.angle;
+                    let bulletX = bx;
+                    let bulletY = by;
+                    
+                    // 修复：检测炮口是否在墙壁内
+                    for(let wall of walls) {
+                        if(this.bulletSpawnInWall(bulletX, bulletY, wall)) {
+                            // 炮口在墙壁内，计算反弹方向
+                            const tankToWallX = wall.x + TILE_SIZE/2 - this.x;
+                            const tankToWallY = wall.y + TILE_SIZE/2 - this.y;
+                            
+                            // 判断墙壁相对于坦克的方向
+                            if(Math.abs(tankToWallX) > Math.abs(tankToWallY)) {
+                                // 水平方向反弹
+                                bulletAngle = Math.PI - bulletAngle;
+                            } else {
+                                // 垂直方向反弹
+                                bulletAngle = -bulletAngle;
+                            }
+                            
+                            // 调整子弹出生点到墙壁边缘
+                            bulletX = this.x + Math.cos(bulletAngle)*25;
+                            bulletY = this.y + Math.sin(bulletAngle)*25;
+                            break;
+                        }
+                    }
+                    
+                    // 发射子弹（会处理子弹数量限制）
+                    this.shootBullet(bulletX, bulletY, bulletAngle);
+                    this.cooldown = this.cooldownMax;
+                    playShootSound();
+                }
+            }
+            
+            // 发射子弹（处理子弹数量限制）
+            shootBullet(x, y, angle) {
+                // 检查子弹数量限制
+                const tankBullets = this === tank1 ? tank1Bullets : tank2Bullets;
+                
+                if(tankBullets.length >= MAX_BULLETS_PER_TANK) {
+                    // 移除最早发射的子弹
+                    const oldestBulletId = tankBullets[0];
+                    for(let i = bullets.length - 1; i >= 0; i--) {
+                        if(bullets[i].id === oldestBulletId) {
+                            bullets.splice(i, 1);
+                            break;
+                        }
+                    }
+                    tankBullets.shift(); // 从坦克子弹列表中移除
+                }
+                
+                // 创建新子弹
+                const tankId = this === tank1 ? 1 : 2;
+                const newBullet = new Bullet(x, y, angle, this.color, tankId);
+                bullets.push(newBullet);
+                tankBullets.push(newBullet.id);
+                
+                // 网络同步子弹
+                if (network && network.connected) {
+                    network.send({
+                        type: 'bullet',
+                        x: x,
+                        y: y,
+                        angle: angle,
+                        color: this.color,
+                        tankId: tankId,
+                        timestamp: Date.now()
+                    });
+                }
+                
+                // 更新子弹数量显示
+                updateBulletCount();
+            }
+            
+            // 检查子弹出生点是否在墙壁内
+            bulletSpawnInWall(bx, by, wall) {
+                return bx > wall.x && bx < wall.x + TILE_SIZE &&
+                       by > wall.y && by < wall.y + TILE_SIZE;
+            }
+            
+            // 处理坦克被击中
+            hit() {
+                if (!this.isAlive) return;
+                this.isAlive = false;
+                this.isVisible = false;
+                createExplosion(this.x, this.y, this.color);
+                playHitTankSound();
+                
+                // 网络同步击中事件
+                if (network && network.connected) {
+                    const playerId = this === tank1 ? 1 : 2;
+                    network.send({
+                        type: 'hit',
+                        player: playerId,
+                        timestamp: Date.now()
+                    });
+                }
+                
+                // 设置死亡暂停
+                startDeathPause(this === tank1 ? '玩家1（红）' : '玩家2（蓝）');
+            }
+            // 重置坦克状态
+            reset(x, y, angle) {
+                this.x = x;
+                this.y = y;
+                this.angle = angle;
+                this.isAlive = true;
+                this.isVisible = true;
+                this.cooldown = 0;
+                // 重置时保持本地控制状态
+                if (network.connected) {
+                    this.isLocal = (network.isHost && this === tank1) || (!network.isHost && this === tank2);
+                } else {
+                    this.isLocal = true;
+                }
+            }
+            collidesWith(wall, x=this.x, y=this.y) {
+                return !(x+this.width/2 < wall.x ||
+                         x-this.width/2 > wall.x+TILE_SIZE ||
+                         y+this.height/2 < wall.y ||
+                         y-this.height/2 > wall.y+TILE_SIZE);
+            }
+            draw() {
+                if (!this.isVisible) return;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+                ctx.fillStyle = '#222';
+                ctx.fillRect(-this.width/2-2, -this.height/2-2, this.width+4, 4);
+                ctx.fillRect(-this.width/2-2, this.height/2-2, this.width+4, 4);
+                ctx.fillStyle = '#111';
+                ctx.fillRect(0, -3, 22, 6);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this===tank1?'1':'2', 0, 0);
+                ctx.restore();
+            }
+        }
+
+        class Bullet {
+            constructor(x, y, angle, color, tankId) {
+                this.id = ++bulletIdCounter; // 唯一ID
+                this.x = x;
+                this.y = y;
+                this.angle = angle;
+                this.speed = 7.5;
+                this.color = color;
+                this.radius = 3.5;
+                this.bounces = 0;
+                this.maxBounces = 50;
+                this.tankId = tankId; // 1=红方，2=蓝方
+            }
+            update() {
+                // 如果游戏暂停，子弹不更新
+                if(roundPaused) return true;
+                
+                this.x += Math.cos(this.angle)*this.speed;
+                this.y += Math.sin(this.angle)*this.speed;
+                if(this.x < -10) this.x = canvas.width+10;
+                if(this.x > canvas.width+10) this.x = -10;
+                if(this.y < -10) this.y = canvas.height+10;
+                if(this.y > canvas.height+10) this.y = -10;
+                for(let wall of walls) {
+                    if(this.collidesWith(wall)) {
+                        const bulletLeft = this.x - this.radius;
+                        const bulletRight = this.x + this.radius;
+                        const bulletTop = this.y - this.radius;
+                        const bulletBottom = this.y + this.radius;
+                        const wallLeft = wall.x;
+                        const wallRight = wall.x + TILE_SIZE;
+                        const wallTop = wall.y;
+                        const wallBottom = wall.y + TILE_SIZE;
+                        const fromLeft = Math.abs(bulletRight - wallLeft);
+                        const fromRight = Math.abs(bulletLeft - wallRight);
+                        const fromTop = Math.abs(bulletBottom - wallTop);
+                        const fromBottom = Math.abs(bulletTop - wallBottom);
+                        const min = Math.min(fromLeft, fromRight, fromTop, fromBottom);
+                        if(min === fromLeft || min === fromRight) this.angle = Math.PI - this.angle;
+                        else this.angle = -this.angle;
+                        this.bounces++;
+                        this.x += Math.cos(this.angle)*5;
+                        this.y += Math.sin(this.angle)*5;
+                        playHitWallSound();
+                        break;
+                    }
+                }
+                if(this.bounces > this.maxBounces) {
+                    // 子弹消失时从坦克子弹列表中移除
+                    removeBulletFromTankList(this.id, this.tankId);
+                    return false;
+                }
+
+                // 子弹命中检测
+                if(this.hits(tank1) && this.color !== '#FF6B6B' && tank1.isAlive) {
+                    tank1.hit();
+                    score2++;
+                    score2El.textContent = score2;
+                    checkGameEnd();
+                    // 子弹命中时从坦克子弹列表中移除
+                    removeBulletFromTankList(this.id, this.tankId);
+                    return false;
+                }
+                if(this.hits(tank2) && this.color !== '#4ECDC4' && tank2.isAlive) {
+                    tank2.hit();
+                    score1++;
+                    score1El.textContent = score1;
+                    checkGameEnd();
+                    // 子弹命中时从坦克子弹列表中移除
+                    removeBulletFromTankList(this.id, this.tankId);
+                    return false;
+                }
+                return true;
+            }
+            collidesWith(wall) {
+                return this.x+this.radius > wall.x &&
+                       this.x-this.radius < wall.x+TILE_SIZE &&
+                       this.y+this.radius > wall.y &&
+                       this.y-this.radius < wall.y+TILE_SIZE;
+            }
+            hits(tank) {
+                const dx = this.x - tank.x;
+                const dy = this.y - tank.y;
+                const distance = Math.sqrt(dx*dx + dy*dy);
+                return distance < this.radius + tank.width/2;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+        
+        // 从坦克子弹列表中移除子弹
+        function removeBulletFromTankList(bulletId, tankId) {
+            if(tankId === 1) {
+                const index = tank1Bullets.indexOf(bulletId);
+                if(index !== -1) tank1Bullets.splice(index, 1);
+            } else if(tankId === 2) {
+                const index = tank2Bullets.indexOf(bulletId);
+                if(index !== -1) tank2Bullets.splice(index, 1);
+            }
+            updateBulletCount();
+        }
+        
+        // 更新子弹数量显示
+        function updateBulletCount() {
+            bulletCount1El.textContent = tank1Bullets.length;
+            bulletCount2El.textContent = tank2Bullets.length;
+        }
+
+        let tank1, tank2;
+        function initGame() {
+            // 初始化网络
+            network.init();
+            
+            tank1 = new Tank(100, 100, '#FF6B6B', {
+                up:'KeyW', down:'KeyS', left:'KeyA', right:'KeyD', fire:'KeyF'
+            });
+            tank2 = new Tank(canvas.width-100, canvas.height-100, '#4ECDC4', {
+                up:'ArrowUp', down:'ArrowDown', left:'ArrowLeft', right:'ArrowRight', fire:'KeyM'
+            });
+            bullets = [];
+            particles = [];
+            tank1Bullets = [];
+            tank2Bullets = [];
+            bulletIdCounter = 0;
+            gameOver = false;
+            roundPaused = false;
+            waitingForSpace = false;
+            deathPauseTimer = 0;
+            updateBulletCount();
+            generateWalls();
+            
+            // 重置坦克控制权（如果是网络游戏，会在连接后重新设置）
+            if (network.connected) {
+                tank1.isLocal = network.isHost;
+                tank2.isLocal = !network.isHost;
+            }
+        }
+
+        // ============== 智能重置系统 ==============
+        
+        // 开始死亡暂停
+        function startDeathPause(deathPlayer) {
+            roundPaused = true;
+            deathPauseTimer = deathPauseDuration;
+            deathMessage = `${deathPlayer} 被击中！`;
+        }
+        
+        // 更新死亡暂停
+        function updateDeathPause() {
+            if (deathPauseTimer > 0) {
+                deathPauseTimer--;
+                if (deathPauseTimer <= 0) {
+                    // 暂停结束，进入等待空格状态
+                    waitingForSpace = true;
+                    deathMessage = "按空格键重新开始当前回合";
+                }
+            }
+        }
+        
+        // 重置当前回合（不重置分数）
+        function resetRound() {
+            // 重置坦克位置和状态
+            tank1.reset(100, 100, 0);
+            tank2.reset(canvas.width - 100, canvas.height - 100, Math.PI);
+            
+            // 清空子弹和粒子
+            bullets = [];
+            particles = [];
+            tank1Bullets = [];
+            tank2Bullets = [];
+            bulletIdCounter = 0;
+            
+            // 生成新地图
+            generateWalls();
+            
+            // 网络同步地图（如果是主机）
+            if (network && network.connected && network.isHost) {
+                network.send({
+                    type: 'walls',
+                    walls: walls,
+                    timestamp: Date.now()
+                });
+            }
+            
+            // 重置暂停状态
+            roundPaused = false;
+            waitingForSpace = false;
+            deathPauseTimer = 0;
+            updateBulletCount();
+        }
+        
+        // 重置整个游戏（重置分数）
+        function resetGame() {
+            score1 = 0;
+            score2 = 0;
+            score1El.textContent = '0';
+            score2El.textContent = '0';
+            initGame();
+            
+            // 网络同步分数
+            if (network && network.connected) {
+                network.send({
+                    type: 'score',
+                    score1: 0,
+                    score2: 0,
+                    timestamp: Date.now()
+                });
+            }
+        }
+        
+        // 检查游戏是否结束
+        function checkGameEnd() {
+            if (score1 >= 5 || score2 >= 5) {
+                gameOver = true;
+                playWinSound();
+            }
+        }
+        
+        // 处理空格键按下
+        function handleSpaceKey() {
+            // 空格键最高优先级，立即处理
+            
+            if (gameOver) {
+                // 游戏结束状态：重置整个游戏
+                resetGame();
+            } else if (waitingForSpace || roundPaused) {
+                // 死亡暂停状态：重置当前回合
+                resetRound();
+            } else {
+                // 游戏进行中：重置当前回合
+                resetRound();
+            }
+        }
+
+        // ============== 输入控制 ==============
+        const keys = {};
+        const gameKeyCodes = [
+            'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyF',
+            'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyM',
+            'KeyN', 'Space', 'KeyR'
+        ];
+        
+        window.addEventListener('keydown', e => {
+            if (gameKeyCodes.includes(e.code)) {
+                e.preventDefault();
+            }
+            
+            keys[e.code] = true;
+            
+            // 空格键处理（最高优先级）
+            if(e.code === 'Space') {
+                handleSpaceKey();
+            }
+            
+            if(e.code === 'KeyN') {
+                soundEnabled = !soundEnabled;
+                soundBtn.textContent = soundEnabled ? '🔊 音效开启中' : '🔇 音效已关闭';
+                if(soundEnabled && audioContext.state === 'suspended') audioContext.resume();
+                if(soundEnabled && !bgSound) bgSound = initBackgroundSound();
+                if(!soundEnabled) stopBackgroundSound();
+            }
+            if(e.code === 'KeyR') {
+                generateWalls();
+                bullets = [];
+                tank1Bullets = [];
+                tank2Bullets = [];
+                updateBulletCount();
+                
+                // 网络同步地图（如果是主机）
+                if (network && network.connected && network.isHost) {
+                    network.send({
+                        type: 'walls',
+                        walls: walls,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+        });
+        
+        window.addEventListener('keyup', e => { 
+            if (gameKeyCodes.includes(e.code)) {
+                e.preventDefault();
+            }
+            keys[e.code] = false; 
+        });
+
+        // 按钮事件
+        restartBtn.addEventListener('click', () => {
+            resetGame();
+        });
+        newMapBtn.addEventListener('click', () => {
+            generateWalls();
+            bullets = [];
+            tank1Bullets = [];
+            tank2Bullets = [];
+            updateBulletCount();
+            
+            // 网络同步地图（如果是主机）
+            if (network && network.connected && network.isHost) {
+                network.send({
+                    type: 'walls',
+                    walls: walls,
+                    timestamp: Date.now()
+                });
+            }
+        });
+        soundBtn.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundBtn.textContent = soundEnabled ? '🔊 音效开启中' : '🔇 音效已关闭';
+            if(soundEnabled && audioContext.state === 'suspended') audioContext.resume();
+            if(soundEnabled && !bgSound) bgSound = initBackgroundSound();
+            if(!soundEnabled) stopBackgroundSound();
+        });
+
+        // ============== 联机面板事件监听 ==============
+        document.getElementById('hostBtn').onclick = () => {
+            document.getElementById('roomSection').style.display = 'block';
+            // 等待ID生成
+            const waitForId = setInterval(() => {
+                if (network.myId) {
+                    document.getElementById('roomInfo').innerHTML = 
+                        `你的房间ID: <span style="color:#ff7e5f">${network.myId}</span><br>
+                         分享这个ID给你的朋友！<br>
+                         <small style="color:#a0aec0">（如果ID没显示，稍等几秒刷新）</small>`;
+                    clearInterval(waitForId);
+                }
+            }, 500);
+        };
+
+        document.getElementById('joinBtn').onclick = () => {
+            document.getElementById('roomSection').style.display = 'block';
+            document.getElementById('roomInfo').innerHTML = 
+                '输入主机的房间ID并点击连接<br><small style="color:#a0aec0">（注意区分大小写）</small>';
+        };
+
+        document.getElementById('connectBtn').onclick = () => {
+            const roomId = document.getElementById('roomIdInput').value.trim();
+            if (roomId) {
+                network.connectTo(roomId);
+                document.getElementById('roomInfo').innerHTML += 
+                    '<br><span style="color:#4fd1c7">正在连接...</span>';
+            } else {
+                document.getElementById('roomInfo').innerHTML += 
+                    '<br><span style="color:#ff6b6b">请输入房间ID</span>';
+            }
+        };
+        
+        // 回车键连接
+        document.getElementById('roomIdInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('connectBtn').click();
+            }
+        });
+        // ============== 联机面板事件结束 ==============
+
+        // ============== 渲染函数 ==============
+        function drawDashedBorder() {
+            ctx.strokeStyle = '#00dbde';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([12, 8]);
+            ctx.strokeRect(3, 3, canvas.width-6, canvas.height-6);
+            ctx.setLineDash([]);
+        }
+
+        function drawWalls() {
+            ctx.fillStyle = '#3a506b';
+            ctx.strokeStyle = '#1c2d4a';
+            ctx.lineWidth = 2;
+            for(let wall of walls) {
+                ctx.fillRect(wall.x, wall.y, TILE_SIZE, TILE_SIZE);
+                ctx.strokeRect(wall.x, wall.y, TILE_SIZE, TILE_SIZE);
+                ctx.fillStyle = '#4a648f';
+                ctx.fillRect(wall.x+4, wall.y+4, TILE_SIZE-8, TILE_SIZE-8);
+                ctx.fillStyle = '#3a506b';
+            }
+        }
+        
+        // 绘制死亡暂停信息
+        function drawDeathPauseInfo() {
+            if (!roundPaused && !waitingForSpace) return;
+            
+            // 半透明背景
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 死亡信息
+            ctx.fillStyle = '#ff7e5f';
+            ctx.font = 'bold 50px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(deathMessage, canvas.width/2, canvas.height/2 - 50);
+            
+            // 如果正在等待空格键
+            if (waitingForSpace) {
+                ctx.fillStyle = '#4fd1c7';
+                ctx.font = '30px Arial';
+                ctx.fillText('按空格键继续', canvas.width/2, canvas.height/2 + 30);
+            }
+            
+            // 显示暂停倒计时（如果还在暂停中）
+            if (deathPauseTimer > 0) {
+                const seconds = (deathPauseTimer / 60).toFixed(1);
+                ctx.fillStyle = '#a0aec0';
+                ctx.font = '24px Arial';
+                ctx.fillText(`暂停: ${seconds}秒`, canvas.width/2, canvas.height/2 + 80);
+            }
+        }
+        
+        // 绘制游戏结束信息
+        function drawGameOverInfo() {
+            if (!gameOver) return;
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const winner = score1 >= 5 ? '玩家1（红）' : '玩家2（蓝）';
+            ctx.fillStyle = '#f8c555';
+            ctx.font = 'bold 60px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${winner} 获胜！`, canvas.width/2, canvas.height/2 - 50);
+            
+            ctx.fillStyle = '#4fd1c7';
+            ctx.font = '30px Arial';
+            ctx.fillText('按空格键重新开始游戏', canvas.width/2, canvas.height/2 + 30);
+            
+            ctx.fillStyle = '#a0aec0';
+            ctx.font = '24px Arial';
+            ctx.fillText('（分数将被重置）', canvas.width/2, canvas.height/2 + 80);
+            
+            // 显示联机状态
+            if (network.connected) {
+                ctx.fillStyle = '#68d391';
+                ctx.font = '20px Arial';
+                ctx.fillText(network.isHost ? '你是主机' : '你是客户端', canvas.width/2, canvas.height/2 + 120);
+            }
+        }
+
+        // ============== 游戏主循环 ==============
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0a0a1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            drawDashedBorder();
+            drawWalls();
+            
+            // 更新死亡暂停计时器
+            if (roundPaused && deathPauseTimer > 0) {
+                updateDeathPause();
+            }
+            
+            // 更新和绘制粒子（即使在暂停中也要更新粒子）
+            for(let i=particles.length-1; i>=0; i--) {
+                if(!particles[i].update()) {
+                    particles.splice(i,1);
+                } else {
+                    particles[i].draw();
+                }
+            }
+            
+            // 只有在没有暂停时才更新游戏对象
+            if (!roundPaused && !gameOver) {
+                // 更新和绘制坦克
+                tank1.update(keys);
+                tank2.update(keys);
+                
+                // 更新和绘制子弹
+                for(let i=bullets.length-1; i>=0; i--) {
+                    if(!bullets[i].update()) {
+                        bullets.splice(i,1);
+                    } else {
+                        bullets[i].draw();
+                    }
+                }
+            }
+            
+            // 绘制坦克（即使在暂停中也要绘制，因为坦克可能死亡隐藏）
+            tank1.draw();
+            tank2.draw();
+            
+            // 绘制暂停信息或游戏结束信息
+            if (gameOver) {
+                drawGameOverInfo();
+            } else if (roundPaused || waitingForSpace) {
+                drawDeathPauseInfo();
+            }
+            
+            // 显示联机状态
+            if (network.connected) {
+                ctx.fillStyle = network.isHost ? '#ff7e5f' : '#4ECDC4';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(network.isHost ? '主机 (红方)' : '客户端 (蓝方)', 20, 30);
+                
+                // 显示连接状态
+                ctx.fillStyle = '#68d391';
+                ctx.font = '14px Arial';
+                ctx.fillText('已连接', 20, 50);
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ============== 初始化 ==============
+        initGame();
+        gameLoop();
+    </script>
+</body>
+</html>
