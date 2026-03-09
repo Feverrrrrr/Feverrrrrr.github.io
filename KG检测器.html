@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库狗（极端鸣潮玩家）检测器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #aaa;
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .start-card {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .test-card {
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .start-card h2 {
+            font-size: 1.4rem;
+        }
+
+        .start-card p {
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 36px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .question-counter {
+            text-align: center;
+            color: #888;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        .option.selected {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #ffd700;
+        }
+
+        .result-card {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .result-icon {
+            font-size: 3rem;
+        }
+
+        .result-title {
+            font-size: 1.6rem;
+        }
+
+        .result-score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .result-desc {
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .result-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .result-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .result-bar-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 16px 0 0 0;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .level-indicator {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+        }
+
+        .level-item {
+            text-align: center;
+            padding: 8px;
+            border-radius: 10px;
+            flex: 1;
+        }
+
+        .level-mihei { background: rgba(100, 100, 255, 0.2); }
+        .level-luren { background: rgba(100, 200, 100, 0.2); }
+        .level-xiaozi { background: rgba(255, 150, 50, 0.2); }
+
+        .level-item .score-range {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .level-item .level-name {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">库狗（极端鸣潮玩家）检测器</div>
+            <div class="subtitle">通过 25 道专业问题，科学检测你的"库狗"程度</div>
+        </header>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">25</div>
+                <div class="stat-label">道专业题目</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3</div>
+                <div class="stat-label">种结果类型</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">≤5</div>
+                <div class="stat-label">分钟完成</div>
+            </div>
+        </div>
+
+        <div id="start-page" class="card start-card fade-in">
+            <h2>你是库狗（极端鸣潮玩家）吗？</h2>
+            <p>通过 25 道精心设计的问题，检测你对鸣潮及其相关争议的认知态度。<br>看看你在"库狗谱系"上处于什么位置。</p>
+            
+            <div class="level-indicator">
+                <div class="level-item level-mihei">
+                    <div class="score-range">0-40分</div>
+                    <div class="level-name">反鸣潮激进者</div>
+                </div>
+                <div class="level-item level-luren">
+                    <div class="score-range">41-75分</div>
+                    <div class="level-name">鸣潮普通玩家</div>
+                </div>
+                <div class="level-item level-xiaozi">
+                    <div class="score-range">76-100分</div>
+                    <div class="level-name">库狗（极端鸣潮玩家）</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="startTest()">立即开始</button>
+        </div>
+
+        <div id="test-page" class="card test-card hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="question-counter" id="question-counter">第 1 题 / 共 20 题</div>
+            <div class="question-text" id="question-text"></div>
+            <div class="options" id="options"></div>
+        </div>
+
+        <div id="result-page" class="card result-card hidden">
+            <div class="result-icon" id="result-icon"></div>
+            <div class="result-title" id="result-title"></div>
+            <div class="result-score" id="result-score"></div>
+            <div class="result-bar">
+                <div class="result-bar-fill" id="result-bar-fill"></div>
+            </div>
+            <div class="result-bar-labels">
+                <span>反鸣潮激进者</span>
+                <span>鸣潮普通玩家</span>
+                <span>库狗（极端鸣潮玩家）</span>
+            </div>
+            <div class="result-desc" id="result-desc"></div>
+            <button class="btn btn-primary" onclick="restartTest()">重新测试</button>
+        </div>
+
+        <footer>
+            <p>本测试仅供娱乐，请理性看待结果</p>
+        </footer>
+    </div>
+
+    <script>
+        const questions = [
+            "鸣潮是目前市面上最优秀的开放世界二次元游戏，没有之一。",
+            "任何批评鸣潮的声音都是竞品请来的水军，毫无参考价值。",
+            "鸣潮的运营团队比玩家更懂游戏，所有决策都是为了游戏长远发展。",
+            "鸣潮的抽卡机制非常良心，比原神、崩铁等竞品好太多。",
+            "鸣潮的剧情和角色塑造完爆所有同类型游戏，艺术价值极高。",
+            "鸣潮的优化问题是玩家设备不行，不是游戏本身的问题。",
+            "为了鸣潮的社区环境，应该封禁所有提出合理批评的玩家。",
+            "鸣潮的数值设计绝对平衡，觉得角色弱的都是自己不会玩。",
+            "我愿意为鸣潮的任何付费内容买单，哪怕性价比不高也无所谓。",
+            "鸣潮的活动奖励已经很丰厚了，玩家不应该贪得无厌。",
+            "鸣潮的二创生态是最好的，其他游戏的二创都毫无灵魂。",
+            "对比原神，鸣潮在玩法创新上实现了全面超越。",
+            "鸣潮的官方客服态度极好，玩家的不满都是无理取闹。",
+            "鸣潮的版本更新节奏完美，不需要根据玩家反馈调整。",
+            "那些退坑鸣潮的玩家都是不懂游戏的云玩家，走了也不可惜。",
+            "鸣潮的角色建模和动作设计是行业天花板，无人能及。",
+            "即使鸣潮出现BUG，官方的处理方式也永远是正确的。",
+            "鸣潮的世界观设定比所有二次元游戏都更宏大、更严谨。",
+            "我会主动在各大平台维护鸣潮，反驳所有批评它的言论。",
+            "鸣潮的音乐和音效制作水平远超国际一线水准。",
+            "鸣潮的体力系统设计合理，限制体力是为了防止玩家过度沉迷。",
+            "我每天都会花费数小时刷鸣潮的日常和副本，从不觉得枯燥。",
+            "鸣潮的联机玩法体验极佳，比原神的联机有趣多了。",
+            "鸣潮的内测福利已经足够，公测福利少是理所应当的。",
+            "鸣潮的未来一定会超越原神，成为二次元游戏的新标杆。"
+        ];
+
+        const options = [
+            { text: "非常同意", score: 4 },
+            { text: "同意", score: 3 },
+            { text: "中立/不确定", score: 2 },
+            { text: "不同意", score: 1 },
+            { text: "非常不同意", score: 0 }
+        ];
+
+        let currentQuestion = 0;
+        let totalScore = 0;
+        let isProcessing = false;
+
+        function startTest() {
+            currentQuestion = 0;
+            totalScore = 0;
+            isProcessing = false;
+            document.getElementById('start-page').classList.add('hidden');
+            document.getElementById('test-page').classList.remove('hidden');
+            document.getElementById('test-page').classList.add('fade-in');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('question-counter').textContent = `第 ${currentQuestion + 1} 题 / 共 ${questions.length} 题`;
+            document.getElementById('question-text').textContent = questions[currentQuestion];
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+
+            options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'option';
+                optionEl.textContent = option.text;
+                optionEl.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionEl);
+            });
+        }
+
+        function selectOption(index) {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            const optionEls = document.querySelectorAll('.option');
+            optionEls.forEach(el => el.classList.remove('selected'));
+            optionEls[index].classList.add('selected');
+
+            setTimeout(() => {
+                totalScore += options[index].score;
+                currentQuestion++;
+
+                if (currentQuestion < questions.length) {
+                    showQuestion();
+                    isProcessing = false;
+                } else {
+                    showResult();
+                }
+            }, 300);
+        }
+
+        function showResult() {
+            document.getElementById('test-page').classList.add('hidden');
+            document.getElementById('result-page').classList.remove('hidden');
+            document.getElementById('result-page').classList.add('fade-in');
+
+            let level, icon, desc, color;
+
+            if (totalScore <= 40) {
+                level = "反鸣潮激进者";
+                icon = "💙";
+                color = "#6464ff";
+                desc = "你对鸣潮持强烈的批评态度，可能认为鸣潮存在诸多问题，或是对其运营、玩法等方面极度不满。你不仅不认可鸣潮的核心价值，还可能主动发表批评言论，与极端鸣潮玩家的观点完全对立。";
+            } else if (totalScore <= 75) {
+                level = "鸣潮普通玩家";
+                icon = "💚";
+                color = "#64c864";
+                desc = "你对鸣潮持中立理性的态度，既不是极端维护者，也不是激进批评者。你可能玩过鸣潮，能客观看待它的优点和不足，会根据自身体验评价游戏，不盲从也不偏激，是最健康的玩家心态。";
+            } else {
+                level = "库狗（极端鸣潮玩家）";
+                icon = "🧡";
+                color = "#ff9632";
+                desc = "你对鸣潮有着近乎狂热的认同和维护，是典型的\"库狗\"。你认为鸣潮毫无缺点，会主动反驳所有批评声音，甚至攻击提出不同意见的玩家。你对鸣潮的忠诚度极高，愿意为其辩护并持续投入大量时间和金钱。";
+            }
+
+            document.getElementById('result-icon').textContent = icon;
+            document.getElementById('result-title').textContent = `鉴定结果：${level}`;
+            document.getElementById('result-score').textContent = `${totalScore} 分`;
+            document.getElementById('result-desc').textContent = desc;
+
+            const barFill = document.getElementById('result-bar-fill');
+            const percentage = (totalScore / 100) * 100;
+            barFill.style.width = percentage + '%';
+            barFill.style.background = color;
+        }
+
+        function restartTest() {
+            document.getElementById('result-page').classList.add('hidden');
+            document.getElementById('start-page').classList.remove('hidden');
+            document.getElementById('start-page').classList.add('fade-in');
+        }
+    </script>
+</body>
+</html>
