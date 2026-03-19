@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>货币战争A830不重复阵容连胜挑战赛</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin: 20px 0 15px;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin: 15px 0 10px;
+        }
+        
+        .rule-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .record-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .record-card {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .form-group {
+            margin: 15px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .danger-btn {
+            background-color: #e74c3c;
+        }
+        
+        .danger-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .success-btn {
+            background-color: #2ecc71;
+        }
+        
+        .success-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .clear-all-btn {
+            background-color: #95a5a6;
+        }
+        
+        .clear-all-btn:hover {
+            background-color: #7f8c8d;
+        }
+        
+        ul {
+            margin: 10px 0 10px 20px;
+        }
+        
+        li {
+            margin-bottom: 5px;
+        }
+        
+        .card-content {
+            margin: 15px 0;
+            min-height: 100px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #3498db;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            margin: 2px;
+        }
+        
+        .gun-badge {
+            background: #e74c3c;
+        }
+        
+        .safe-badge {
+            background: #2ecc71;
+        }
+        
+        .current-stats {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .drawn-result {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff8e1;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff8f00;
+        }
+        
+        .card-list {
+            margin: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .data-control-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>第一届货币战争A830不重复阵容连胜挑战赛</h1>
+        <h2>                        败者为GAY<h2>
+        
+        <!-- 赛事规则区域 -->
+        <div class="rule-section">
+            <h2>一、赛事核心目标</h2>
+            <p>完成A830关卡连胜挑战，全程遵循阵容不重复核心规则，挑战最高连胜场次</p>
+            
+            <h2>二、核心规则：阵容不重复（硬性要求）</h2>
+            <ul>
+                <li>1. 3-7关卡BOSS结算时，伤害最高的羁绊/角色，后续挑战中不可再次使用；</li>
+                <li>2. 3星昔涟所带来的所有胜利场次，统一记作同一套阵容，该羁绊/角色后续不可复用；</li>
+                <li>3. 每一轮挑战的核心输出角色均需全新轮换，严禁重复套用。</li>
+                <li>3. 每一轮随机禁用1~3个羁绊（不能将禁用羁绊叠至金色）。</li>
+            </ul>
+            
+            <h2>三、挑战轮换规则</h2>
+            <ul>
+                <li>1. 挑战资格：已解锁货币战争A8-30关卡；</li>
+                <li>2. 轮换顺序：按顺序，每完成1场战斗更换下一位群友进行挑战，依次循环；</li>
+            </ul>
+            
+            <h2>四、血量与淘汰规则（失败惩罚机制）</h2>
+            <ul>
+                <li>1. 触发条件：本场战斗挑战失败，立即启动惩罚机制；</li>
+                <li>2. 抽卡规则：从4张特制卡牌中随机抽取1张，包含3张安全牌、1张枪牌；</li>
+                <li>3. 结果判定：
+                    <ul>
+                        <li>抽到枪牌：号主本人号禁用，只能参与策略讨论；</li>
+                        <li>抽到安全牌：弃置该安全牌，剩余卡牌继续用于下一次失败惩罚，可继续挑战；</li>
+                    </ul>
+                </li>
+                <li>4. 重置逻辑：每成功挑战1关，血量池不重置，仅失败时触发抽卡。</li>
+            </ul>
+            
+            <h2>五、能力道具：重开机会</h2>
+            <ul>
+                <li>1. 使用次数：初始全程仅限使用2次；每满血通关一次增加一次使用次数</li>
+                <li>2. 使用节点：每局2-3关卡之前可使用，2-3关卡及之后不可使用；</li>
+                <li>3. 使用效果：立即重开当前对局，不触发血量抽卡惩罚，不计入失败判定；</li>
+                <li>4. 限制：重开机会用完后，失败直接按第四条规则执行抽卡。</li>
+            </ul>
+        </div>
+
+        <!-- 新增：一键清空所有数据按钮 -->
+        <div class="data-control-section">
+            <button class="clear-all-btn" onclick="clearAllData()"> 一键清空所有记录数据</button>
+        </div>
+        
+        <!-- 核心功能区域 -->
+        <div class="record-section">
+            <!-- 连胜记录 -->
+            <div class="record-card">
+                <h2>😂 连胜记录管理</h2>
+                <div class="form-group">
+                    <label>当前连胜场次</label>
+                    <input type="number" id="win-streak" value="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label>挑战结果</label>
+                    <button class="success-btn" onclick="updateWinStreak('win')">✅ 挑战成功</button>
+                    <button class="danger-btn" onclick="updateWinStreak('lose')">❌ 挑战失败</button>
+                </div>
+                <div class="current-stats">
+                    当前最高连胜：<span id="max-streak">0</span> 场
+                </div>
+            </div>
+            
+            <!-- 禁用阵容管理 -->
+            <div class="record-card">
+                <h2>🚫 禁用阵容/角色记录</h2>
+                <div class="form-group">
+                    <label>新增禁用角色/羁绊</label>
+                    <input type="text" id="forbidden-unit" placeholder="请向禁用池中定向添加上局最高伤害角色/羁绊">
+                    <button onclick="addForbiddenUnit()">➕ 添加禁用项</button>
+                </div>
+                <div class="card-content" id="forbidden-list">
+                    <p>暂无禁用阵容/角色</p>
+                </div>
+            </div>
+
+            <!-- 禁用阵容随机抽卡（集成核心） -->
+            <div class="record-card">
+                <h2>🎲 禁用羁绊随机抽卡</h2>
+                <div class="form-group">
+                    <label>添加新卡牌（羁绊名称）：</label>
+                    <input type="text" id="new-card-input" placeholder="请向卡池中定向添加羁绊">
+                    <button onclick="addCardToPool()">➕ 添加到卡池</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>当前卡池卡牌列表：</label>
+                    <div id="card-pool-list" class="card-list">
+                        暂无卡牌，请先添加
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>单次抽卡数量：</label>
+                    <select id="draw-count-select" style="width:auto;">
+                        <option value="1">1张</option>
+                        <option value="2">2张</option>
+                        <option value="3">3张</option>
+                    </select>
+                    <button class="danger-btn" onclick="drawRandomCards()" style="margin-left:10px;">🎯 开始随机抽卡</button>
+                </div>
+                
+                <div id="draw-result" class="drawn-result" style="display: none;">
+                    <!-- 抽卡结果会动态生成 -->
+                </div>
+                
+                <div class="form-group">
+                    <label>已抽中禁用的阵容/角色：</label>
+                    <div id="disabled-card-list" class="card-list">
+                        暂无禁用阵容
+                    </div>
+                </div>
+                
+                
+                <button onclick="resetDisabledList()">🔄 重置禁用列表</button>
+            </div>
+                        
+            <!-- 失败惩罚抽卡 -->
+            <div class="record-card">
+                <h2>🎴 失败的菜鸡抽卡</h2>
+                <div class="form-group">
+                    <label>剩余卡牌</label>
+                    <div id="card-count">
+                        安全牌：<span id="safe-cards">3</span> 张 | 枪牌：<span id="gun-cards">1</span> 张
+                    </div>
+                </div>
+                <button class="danger-btn" onclick="drawCard()">🎲 抽取惩罚卡牌</button>
+                <div class="card-content" id="draw-result-punish">
+                    <p>点击按钮进行抽卡</p>
+                </div>
+                <button onclick="resetCards()">🔄 重置卡牌池</button>
+            </div>
+            
+            <!-- 重开机会管理 -->
+            <div class="record-card">
+                <h2>🔁 重开机会管理</h2>
+                <div class="form-group">
+                    <label>剩余重开次数</label>
+                    <input type="number" id="retry-count" value="2" min="0">
+                </div>
+                <button onclick="useRetry()">🛠️ 使用一次重开机会</button>
+                <button onclick="addRetry()">➕ 满血通关增加一次重开机会</button>
+                <div class="current-stats">
+                    可用重开次数：<span id="retry-display">2</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===================== 全局数据配置（这里可以方便添加初始卡牌）=====================
+        const INITIAL_CARD_POOL = [
+            "仙舟",
+            "狼狩",
+            "夜之半神",
+            "昼之半神",
+            "贝洛伯格",
+            "列车同行",
+            "星间旅人",
+	    "银河学者",
+	    "盛会之星",
+	    "星核猎手",
+	    "巡海游侠",
+	    "公司",
+	    "击破",
+	    "追击",
+            "能量",
+            "群攻",
+            "战技点",
+            "持续伤害",
+            "减益",
+            "燃血",
+            "量子同频",
+            "治疗",
+            "护盾",
+        ];
+
+        // 基础全局变量
+        let maxStreak = 0;
+        let forbiddenUnits = [];
+        let safeCards = 3;
+        let gunCards = 1;
+        let retryCount = 2;
+        let players = [];
+        let currentPlayerIndex = -1;
+
+        let cardPool = [];
+        let disabledCards = [];
+
+        // 本地存储键名
+        const STORAGE_KEY = "currency_war_a830_data";
+
+        // ===================== 本地存储核心函数 =====================
+        // 初始化：从本地读取数据（首次打开自动加载初始卡牌）
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (!saved) {
+                    // 首次使用，加载初始卡牌
+                    cardPool = [...INITIAL_CARD_POOL];
+                    saveToLocalStorage();
+                    alert("首次使用，已加载默认初始卡牌！");
+                    return;
+                }
+
+                const data = JSON.parse(saved);
+
+                maxStreak = data.maxStreak ?? 0;
+                forbiddenUnits = data.forbiddenUnits ?? [];
+                safeCards = data.safeCards ?? 3;
+                gunCards = data.gunCards ?? 1;
+                retryCount = data.retryCount ?? 2;
+                players = data.players ?? [];
+                currentPlayerIndex = data.currentPlayerIndex ?? -1;
+
+                cardPool = data.cardPool ?? [...INITIAL_CARD_POOL]; // 无数据时用初始卡牌
+                disabledCards = data.disabledCards ?? [];
+
+                // 更新页面显示
+                document.getElementById("max-streak").textContent = maxStreak;
+                document.getElementById("retry-count").value = retryCount;
+                document.getElementById("retry-display").textContent = retryCount;
+                document.getElementById("safe-cards").textContent = safeCards;
+                document.getElementById("gun-cards").textContent = gunCards;
+            } catch (e) {
+                console.log("读取本地数据失败，使用初始配置", e);
+                cardPool = [...INITIAL_CARD_POOL];
+            }
+        }
+
+        // 保存到本地
+        function saveToLocalStorage() {
+            const data = {
+                maxStreak,
+                forbiddenUnits,
+                safeCards,
+                gunCards,
+                retryCount,
+                players,
+                currentPlayerIndex,
+                cardPool,
+                disabledCards
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // 新增：一键清空所有数据
+        function clearAllData() {
+            if (!confirm("⚠️ 确定要清空所有记录数据吗？此操作不可恢复！")) {
+                return;
+            }
+            
+            // 重置所有数据
+            maxStreak = 0;
+            forbiddenUnits = [];
+            safeCards = 3;
+            gunCards = 1;
+            retryCount = 2;
+            players = [];
+            currentPlayerIndex = -1;
+            cardPool = [...INITIAL_CARD_POOL]; // 清空后恢复初始卡牌
+            disabledCards = [];
+
+            // 更新页面显示
+            document.getElementById("max-streak").textContent = maxStreak;
+            document.getElementById("win-streak").value = 0;
+            document.getElementById("retry-count").value = retryCount;
+            document.getElementById("retry-display").textContent = retryCount;
+            document.getElementById("safe-cards").textContent = safeCards;
+            document.getElementById("gun-cards").textContent = gunCards;
+            document.getElementById("player-display").textContent = "未设置";
+            document.getElementById("player-list").value = "";
+            document.getElementById("draw-result-punish").innerHTML = "<p>点击按钮进行抽卡</p>";
+            
+            // 更新各类列表
+            updateForbiddenList();
+            updateCardPoolDisplay();
+            updateDisabledListDisplay();
+            updateRetryDisplay();
+
+            // 清空本地存储并重新保存初始数据
+            localStorage.removeItem(STORAGE_KEY);
+            saveToLocalStorage();
+
+            alert("✅ 所有数据已清空，恢复到初始状态！");
+        }
+
+        // ===================== 原有功能 =====================
+        function updateWinStreak(result) {
+            const winStreakInput = document.getElementById('win-streak');
+            let currentStreak = parseInt(winStreakInput.value);
+
+            if (result === 'win') {
+                currentStreak++;
+                winStreakInput.value = currentStreak;
+                if (currentStreak > maxStreak) {
+                    maxStreak = currentStreak;
+                    document.getElementById('max-streak').textContent = maxStreak;
+                }
+                alert(`挑战成功！当前连胜：${currentStreak} 场`);
+            } else {
+                alert(`挑战失败！连胜中断，当前连胜重置为0`);
+                winStreakInput.value = 0;
+            }
+            saveToLocalStorage();
+        }
+
+        function addForbiddenUnit() {
+            const input = document.getElementById('forbidden-unit');
+            const unit = input.value.trim();
+            if (!unit) { alert('请输入禁用的角色/羁绊名称'); return; }
+            if (forbiddenUnits.includes(unit)) { alert('该角色/羁绊已在禁用列表中'); return; }
+            forbiddenUnits.push(unit);
+            input.value = '';
+            updateForbiddenList();
+            saveToLocalStorage();
+        }
+
+        function updateForbiddenList() {
+            const listContainer = document.getElementById('forbidden-list');
+            if (forbiddenUnits.length === 0) {
+                listContainer.innerHTML = '<p>暂无禁用羁绊/角色</p>';
+                return;
+            }
+            let html = '<div>';
+            forbiddenUnits.forEach((unit, index) => {
+                html += `<span class="badge">${unit} <button onclick="removeForbiddenUnit(${index})" style="background:none; border:none; color:white; cursor:pointer;">×</button></span>`;
+            });
+            html += '</div>';
+            listContainer.innerHTML = html;
+        }
+
+        function removeForbiddenUnit(index) {
+            forbiddenUnits.splice(index, 1);
+            updateForbiddenList();
+            saveToLocalStorage();
+        }
+
+
+
+        function drawCard() {
+            if (safeCards + gunCards === 0) {
+                alert('卡牌池已空，请先重置卡牌');
+                return;
+            }
+            
+            const totalCards = safeCards + gunCards;
+            const randomNum = Math.floor(Math.random() * totalCards) + 1;
+            
+            let result = '';
+            let isGun = false;
+            
+            if (randomNum <= safeCards) {
+                safeCards--;
+                result = `<p>🎉 抽到 <span class="badge safe-badge">安全牌</span>！</p>
+                          <p>惩罚豁免，可继续挑战</p>
+                          <p>剩余卡牌：安全牌 ${safeCards} 张，枪牌 ${gunCards} 张</p>`;
+            } else {
+                gunCards--;
+                isGun = true;
+                result = `<p>💥 抽到 <span class="badge gun-badge">枪牌</span>！</p>
+                          <p>惩罚生效：号主本人号禁用，只能参与策略讨论</p>
+                          <p>剩余卡牌：安全牌 ${safeCards} 张，枪牌 ${gunCards} 张</p>`;
+            }
+            
+            document.getElementById('draw-result-punish').innerHTML = result;
+            document.getElementById('safe-cards').textContent = safeCards;
+            document.getElementById('gun-cards').textContent = gunCards;
+            
+            saveToLocalStorage(); // 保存抽卡后的数据
+            
+            if (isGun) {
+                alert('抽到枪牌！号主账号禁用，只能参与策略讨论');
+            } else {
+                alert('抽到安全牌！可继续挑战');
+            }
+        }
+
+        function resetCards() {
+            safeCards = 3;
+            gunCards = 1;
+            document.getElementById('safe-cards').textContent = safeCards;
+            document.getElementById('gun-cards').textContent = gunCards;
+            document.getElementById('draw-result-punish').innerHTML = '<p>卡牌池已重置，点击按钮进行抽卡</p>';
+            saveToLocalStorage(); // 保存重置后的数据
+            alert('卡牌池已重置：安全牌3张，枪牌1张');
+        }
+
+        function useRetry() {
+            if (retryCount <= 0) {
+                alert('已无可用重开机会！');
+                return;
+            }
+            
+            retryCount--;
+            updateRetryDisplay();
+            saveToLocalStorage(); // 保存重开次数
+            alert(`使用一次重开机会，剩余次数：${retryCount}`);
+        }
+
+        function addRetry() {
+            retryCount++;
+            updateRetryDisplay();
+            saveToLocalStorage(); // 保存重开次数
+            alert(`增加一次重开机会，剩余次数：${retryCount}`);
+        }
+
+        function updateRetryDisplay() {
+            document.getElementById('retry-count').value = retryCount;
+            document.getElementById('retry-display').textContent = retryCount;
+        }
+
+        // ===================== 抽卡功能 =====================
+        function addCardToPool() {
+            const input = document.getElementById('new-card-input');
+            const cardName = input.value.trim();
+            
+            if (!cardName) {
+                alert('请输入有效的卡牌名称！');
+                return;
+            }
+            if (cardPool.includes(cardName)) {
+                alert(`卡牌「${cardName}」已存在于卡池中，无需重复添加！`);
+                input.value = '';
+                return;
+            }
+            
+            cardPool.push(cardName);
+            input.value = '';
+            updateCardPoolDisplay();
+            saveToLocalStorage();
+            alert(`✅ 卡牌「${cardName}」已成功添加到卡池！`);
+        }
+
+        function updateCardPoolDisplay() {
+            const poolList = document.getElementById('card-pool-list');
+            if (cardPool.length === 0) {
+                poolList.innerHTML = '暂无卡牌，请先添加';
+                return;
+            }
+            
+            let html = '';
+            cardPool.forEach(card => {
+                html += `<span class="badge">${card}</span>`;
+            });
+            poolList.innerHTML = html;
+        }
+
+        function clearCardPool() {
+            if (confirm('确定要清空整个卡池吗？此操作不可恢复！')) {
+                cardPool = [];
+                updateCardPoolDisplay();
+                saveToLocalStorage();
+                alert('卡池已清空！');
+            }
+        }
+
+        function drawRandomCards() {
+            if (cardPool.length === 0) {
+                alert('卡池为空，无法抽卡！请先添加卡牌。');
+                return;
+            }
+            
+            const drawCount = parseInt(document.getElementById('draw-count-select').value);
+            if (drawCount > cardPool.length) {
+                alert(`卡池仅剩 ${cardPool.length} 张卡牌，无法抽取 ${drawCount} 张！`);
+                return;
+            }
+            
+            const drawnCards = [];
+            const poolCopy = [...cardPool];
+            for (let i = 0; i < drawCount; i++) {
+                const randomIndex = Math.floor(Math.random() * poolCopy.length);
+                const drawnCard = poolCopy.splice(randomIndex, 1)[0];
+                drawnCards.push(drawnCard);
+                
+                disabledCards.push(drawnCard);
+                cardPool = cardPool.filter(card => card !== drawnCard);
+            }
+            
+            const resultDiv = document.getElementById('draw-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                本次抽卡结果：<br><br>
+                ${drawnCards.join('、')}<br><br>
+                以上阵容/角色已加入禁用列表！
+            `;
+            
+            updateCardPoolDisplay();
+            updateDisabledListDisplay();
+            
+            drawnCards.forEach(card => {
+                if (!forbiddenUnits.includes(card)) {
+                    forbiddenUnits.push(card);
+                }
+            });
+            updateForbiddenList();
+            
+            saveToLocalStorage(); // 保存抽卡后的数据
+            alert(`抽卡完成！本次抽中：${drawnCards.join('、')}`);
+        }
+
+        function updateDisabledListDisplay() {
+            const disabledList = document.getElementById('disabled-card-list');
+            if (disabledCards.length === 0) {
+                disabledList.innerHTML = '暂无禁用阵容';
+                return;
+            }
+            
+            let html = '';
+            disabledCards.forEach(card => {
+                html += `<span class="badge gun-badge">${card}</span>`;
+            });
+            disabledList.innerHTML = html;
+        }
+
+        function resetDisabledList() {
+            if (confirm('确定要重置禁用列表吗？已禁用的卡牌将重新回到卡池！')) {
+                cardPool = [...new Set([...cardPool, ...disabledCards])];
+                disabledCards = [];
+                
+                forbiddenUnits = [];
+                updateForbiddenList();
+                
+                updateCardPoolDisplay();
+                updateDisabledListDisplay();
+                document.getElementById('draw-result').style.display = 'none';
+                
+                saveToLocalStorage(); // 保存重置后的数据
+                alert('禁用列表已重置，所有卡牌已回归卡池！');
+            }
+        }
+
+        // ===================== 页面初始化 =====================
+        window.onload = function() {
+            loadFromLocalStorage();  // 加载本地数据（首次加载初始卡牌）
+            updateForbiddenList();
+            updateRetryDisplay();
+            updateCardPoolDisplay();
+            updateDisabledListDisplay();
+        };
+    </script>
+</body>
+</html>
