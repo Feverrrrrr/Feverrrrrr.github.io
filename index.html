@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fever - 游戏开发者作品集</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <span class="logo-icon">🎮</span>
+                <span class="logo-text">Fever</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active">首页</a></li>
+                <li><a href="#about" class="nav-link">关于</a></li>
+                <li><a href="#games" class="nav-link">游戏作品</a></li>
+                <li><a href="#contact" class="nav-link">联系</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="nav-toggle" id="navToggle" aria-label="导航菜单">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <section class="hero" id="home">
+        <div class="hero-background">
+            <div class="particle" style="--x: 10%; --y: 20%; --size: 3px;"></div>
+            <div class="particle" style="--x: 50%; --y: 60%; --size: 5px;"></div>
+            <div class="particle" style="--x: 80%; --y: 30%; --size: 2px;"></div>
+            <div class="particle" style="--x: 30%; --y: 80%; --size: 4px;"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">游戏开发者</div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">你好，我是 Fever</span>
+                </h1>
+                <p class="hero-subtitle">
+                    热爱创造有趣、创新的网页游戏。专注于将创意转化为交互式体验。
+                </p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">4+</div>
+                        <div class="stat-label">游戏作品</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">代码实现</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">🎮</div>
+                        <div class="stat-label">游戏热爱</div>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <a href="#games" class="btn btn-primary">
+                        <i class="fas fa-gamepad"></i> 查看作品
+                    </a>
+                    <a href="#about" class="btn btn-outline">
+                        <i class="fas fa-user"></i> 关于我
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="game-console">
+                    <div class="console-screen">
+                        <div class="screen-content">
+                            <div class="pixel-art">👾</div>
+                            <div class="screen-text">正在开发中...</div>
+                        </div>
+                    </div>
+                    <div class="console-controls">
+                        <div class="control-btn"></div>
+                        <div class="control-btn"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我区域 -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-title-badge">关于我</span>
+                    游戏开发之旅
+                </h2>
+                <p class="section-subtitle">探索我的创作理念和技术栈</p>
+            </div>
+            <div class="about-content">
+                <div class="about-card">
+                    <div class="about-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="about-card-title">技术栈</h3>
+                    <p class="about-card-text">
+                        熟练掌握HTML5、CSS3、JavaScript、Pygame等前端和游戏开发技术。
+                        专注于创造流畅的交互体验和视觉表现。
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">HTML5</span>
+                        <span class="tech-tag">CSS3</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">Pygame</span>
+                        <span class="tech-tag">Canvas API</span>
+                        <span class="tech-tag">WebGL</span>
+                    </div>
+                </div>
+                <div class="about-card">
+                    <div class="about-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3 class="about-card-title">开发理念</h3>
+                    <p class="about-card-text">
+                        我相信游戏是艺术与技术的完美结合。每个项目都是一个新的挑战，
+                        旨在创造令人愉悦且富有创意的互动体验。
+                    </p>
+                    <div class="dev-principles">
+                        <div class="principle">
+                            <i class="fas fa-star"></i>
+                            <span>创意优先</span>
+                        </div>
+                        <div class="principle">
+                            <i class="fas fa-users"></i>
+                            <span>用户体验</span>
+                        </div>
+                        <div class="principle">
+                            <i class="fas fa-magic"></i>
+                            <span>视觉表现</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-card">
+                    <div class="about-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="about-card-title">未来规划</h3>
+                    <p class="about-card-text">
+                        计划探索更多游戏类型和技术，包括3D游戏开发、
+                        多人联机游戏和移动端游戏优化。
+                    </p>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <span>更多游戏类型</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <span>技术深度探索</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <span>社区分享</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 游戏作品区域 -->
+    <section class="games-section" id="games">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-title-badge">作品展示</span>
+                    我的网页游戏
+                </h2>
+                <p class="section-subtitle">点击卡片直接体验游戏</p>
+            </div>
+            <div class="games-grid" id="gamesGrid">
+                <!-- 游戏卡片会通过JavaScript动态加载 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系区域 -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-title-badge">保持联系</span>
+                    找到我
+                </h2>
+                <p class="section-subtitle">欢迎交流游戏开发心得</p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="contact-title">GitHub</h3>
+                    <p class="contact-text">
+                        查看我的所有项目和源代码
+                    </p>
+                    <a href="https://github.com/Feverrrrrr" class="contact-link" target="_blank">
+                        Feverrrrrr.github.io
+                    </a>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <h3 class="contact-title">分享作品</h3>
+                    <p class="contact-text">
+                        如果你喜欢我的游戏，欢迎分享给朋友
+                    </p>
+                    <div class="social-share">
+                        <button class="share-btn" data-platform="twitter">
+                            <i class="fab fa-twitter"></i>
+                        </button>
+                        <button class="share-btn" data-platform="facebook">
+                            <i class="fab fa-facebook"></i>
+                        </button>
+                        <button class="share-btn" data-platform="weibo">
+                            <i class="fab fa-weibo"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 class="contact-title">反馈建议</h3>
+                    <p class="contact-text">
+                        对游戏有任何建议或想合作开发？
+                    </p>
+                    <a href="mailto:example@example.com" class="btn btn-outline">
+                        <i class="fas fa-paper-plane"></i> 发送邮件
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🎮</span>
+                    <span class="logo-text">Fever</span>
+                    <p class="footer-tagline">用代码创造游戏世界</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4 class="footer-title">导航</h4>
+                        <a href="#home" class="footer-link">首页</a>
+                        <a href="#about" class="footer-link">关于</a>
+                        <a href="#games" class="footer-link">作品</a>
+                        <a href="#contact" class="footer-link">联系</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4 class="footer-title">技术</h4>
+                        <a href="#" class="footer-link">HTML5</a>
+                        <a href="#" class="footer-link">JavaScript</a>
+                        <a href="#" class="footer-link">Pygame</a>
+                        <a href="#" class="footer-link">Canvas</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">© 2026 Fever. 保留所有权利。 用 ❤️ 开发游戏</p>
+                <div class="footer-social">
+                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-codepen"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 游戏详情模态框 -->
+    <div class="modal" id="gameModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-body" id="modalBody">
+                <!-- 模态框内容会动态加载 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回顶部按钮 -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
